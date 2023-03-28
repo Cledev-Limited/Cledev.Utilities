@@ -1,4 +1,4 @@
-# Cledev (Preview)
+# Cledev.Utilities (Preview)
 A collection of tools that I use in my own .NET projects.
 
 [![Main](https://github.com/lucabriguglia/Cledev.Tools/actions/workflows/main.yml/badge.svg)](https://github.com/lucabriguglia/Cledev.Tools/actions/workflows/main.yml)
