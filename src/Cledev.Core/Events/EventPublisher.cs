@@ -12,7 +12,7 @@ public class EventPublisher : IEventPublisher
         _serviceProvider = serviceProvider;
     }
 
-    public async Task<Result> Publish<TEvent>(TEvent @event) where TEvent : IEvent
+    public async Task<Result> Publish<TEvent>(TEvent? @event) where TEvent : IEvent
     {
         if (@event is null)
         {
@@ -23,8 +23,12 @@ public class EventPublisher : IEventPublisher
 
         var tasks = handlers.Select(handler => handler.Handle(@event)).ToList();
 
-        await Task.WhenAll(tasks);
-
+        var results = await Task.WhenAll(tasks);
+        if (results.Any(result => result.IsFailure))
+        {
+            // TODO: Handle event publisher failed results
+        }
+        
         return Result.Ok();
     }
 }

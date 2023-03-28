@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace Cledev.Core.Utilities;
+namespace Cledev.Core.Extensions;
 
 public static class ClaimsPrincipalExtensions
 {

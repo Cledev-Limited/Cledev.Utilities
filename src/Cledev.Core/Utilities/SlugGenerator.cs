@@ -1,4 +1,6 @@
-﻿namespace Cledev.Core.Utilities;
+﻿using Cledev.Core.Extensions;
+
+namespace Cledev.Core.Utilities;
 
 public interface ISlugGenerator
 {

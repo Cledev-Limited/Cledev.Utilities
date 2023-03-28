@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Cledev.Core.Utilities;
+namespace Cledev.Core.Extensions;
 
 public static class ReflectionExtensions
 {
@@ -20,7 +20,7 @@ public static class ReflectionExtensions
 
         var currentValue = property.GetValue(obj);
         var defaultValue = Activator.CreateInstance(obj.GetType()).GetType().GetRuntimeProperty(name).GetValue(obj);
-            
+
         return currentValue != defaultValue;
     }
 

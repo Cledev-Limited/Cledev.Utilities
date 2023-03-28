@@ -1,4 +1,5 @@
 ﻿using Cledev.Core.Events;
+using Cledev.Core.Results;
 using Cledev.Example.Shared;
 using Cledev.Server.Caching;
 
@@ -16,18 +17,19 @@ public class CacheHandlers :
         _cacheManager = cacheManager;
     }
 
-    public async Task Handle(ItemCreated @event) => 
+    public async Task<Result> Handle(ItemCreated @event) => 
         await ClearItemsCache();
 
-    public async Task Handle(ItemDeleted @event) => 
+    public async Task<Result> Handle(ItemDeleted @event) => 
         await ClearItemsCache();
 
-    public async Task Handle(ItemUpdated @event) => 
+    public async Task<Result> Handle(ItemUpdated @event) => 
         await ClearItemsCache();
 
-    private async Task ClearItemsCache()
+    private async Task<Result> ClearItemsCache()
     {
         await Task.CompletedTask;
         _cacheManager.Remove("Items");
+        return Result.Ok();
     }
 }

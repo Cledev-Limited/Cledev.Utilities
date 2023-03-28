@@ -1,4 +1,4 @@
-﻿namespace Cledev.Core.Utilities.Async;
+﻿namespace Cledev.Core.Extensions;
 
 /// <summary>
 /// Helper class to run async methods within a sync process.

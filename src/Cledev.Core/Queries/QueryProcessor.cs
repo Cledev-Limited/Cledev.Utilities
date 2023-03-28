@@ -14,7 +14,7 @@ public class QueryProcessor : IQueryProcessor
         _serviceProvider = serviceProvider;
     }
 
-    public async Task<Result<TResult>> Process<TResult>(IQuery<TResult> query)
+    public async Task<Result<TResult>> Process<TResult>(IQuery<TResult>? query)
     {
         if (query is null)
         {

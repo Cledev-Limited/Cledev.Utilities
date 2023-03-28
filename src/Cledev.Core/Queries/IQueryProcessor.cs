@@ -4,5 +4,5 @@ namespace Cledev.Core.Queries;
 
 public interface IQueryProcessor
 {
-    Task<Result<TResult>> Process<TResult>(IQuery<TResult> query);
+    Task<Result<TResult>> Process<TResult>(IQuery<TResult>? query);
 }

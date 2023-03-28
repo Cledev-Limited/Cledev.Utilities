@@ -1,6 +1,8 @@
-﻿namespace Cledev.Core.Events;
+﻿using Cledev.Core.Results;
+
+namespace Cledev.Core.Events;
 
 public interface IEventHandler<in TEvent> where TEvent : IEvent
 {
-    Task Handle(TEvent @event);
+    Task<Result> Handle(TEvent @event);
 }

@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Cledev.Core.Utilities;
+namespace Cledev.Core.Extensions;
 
 public static class StringExtensions
 {
@@ -22,7 +22,7 @@ public static class StringExtensions
         {
             throw new ArgumentNullException(nameof(text));
         }
-        
+
         var stringBuilder = new StringBuilder();
 
         var previousChar = char.MinValue;

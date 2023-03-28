@@ -12,6 +12,7 @@ public sealed class Result : OneOfBase<Success, Failure>
     public static implicit operator Result(IEvent[] events) => new(new Success(events));
     
     public bool IsSuccess => IsT0;
+    public bool IsNotSuccess => IsT1;
     public bool IsFailure => IsT1;
 
     public Success Success => AsT0;
@@ -37,6 +38,7 @@ public sealed class Result<TResult> : OneOfBase<Success<TResult>, Failure>
     public static implicit operator Result<TResult>(IEvent[] events) => new(new Success<TResult>(events));
     
     public bool IsSuccess => IsT0;
+    public bool IsNotSuccess => IsT1;
     public bool IsFailure => IsT1;
 
     public Success<TResult> Success => AsT0;
