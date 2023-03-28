@@ -22,7 +22,7 @@ public sealed class Result : OneOfBase<Success, Failure>
     
     public static Result Ok(Success success) => new(success);
     public static Result Ok(params IEvent[] events) => new(new Success(events));
-    public static Result Fail(string errorCode = ErrorCodes.Error, string? title = null, string? description = null) => new(new Failure(errorCode, title, description));
+    public static Result Fail(string errorCode = ErrorCodes.Error, string? title = null, string? description = null, string? type = null) => new(new Failure(errorCode, title, description, type));
 
     public bool TryPickSuccess(out Success success, out Failure failure) => TryPickT0(out success, out failure);
     public bool TryPickFailure(out Failure failure, out Success success) => TryPickT1(out failure, out success);
@@ -49,7 +49,7 @@ public sealed class Result<TResult> : OneOfBase<Success<TResult>, Failure>
 
     public static Result<TResult> Ok(Success<TResult> success) => new(success);
     public static Result<TResult> Ok(TResult result, params IEvent[] events) => new(new Success<TResult>(result, events));
-    public static Result<TResult> Fail(string errorCode = ErrorCodes.Error, string? title = null, string? description = null) => new(new Failure(errorCode, title, description));
+    public static Result<TResult> Fail(string errorCode = ErrorCodes.Error, string? title = null, string? description = null, string? type = null) => new(new Failure(errorCode, title, description, type));
 
     public bool TryPickSuccess(out Success<TResult> success, out Failure failure) => TryPickT0(out success, out failure);
     public bool TryPickFailure(out Failure failure, out Success<TResult> success) => TryPickT1(out failure, out success);

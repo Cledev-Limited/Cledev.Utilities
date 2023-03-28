@@ -7,7 +7,7 @@ namespace Cledev.Example.Server.Handlers;
 
 public class GetCreateItemHandler : IQueryHandler<GetCreateItem, CreateItem>
 {
-    public async Task<Result<CreateItem>> Handle(GetCreateItem query)
+    public async Task<Result<CreateItem>> Handle(GetCreateItem query, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
 

@@ -10,8 +10,8 @@ namespace Cledev.Server.Services;
 
 public interface IControllerService
 {
-    Task<ActionResult> ProcessCommand<TCommand>(TCommand command) where TCommand : ICommand;
-    Task<ActionResult> ProcessQuery<TResult>(IQuery<TResult> query);
+    Task<ActionResult> ProcessCommand<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand;
+    Task<ActionResult> ProcessQuery<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default);
 }
 
 public class ControllerService : IControllerService
@@ -25,26 +25,26 @@ public class ControllerService : IControllerService
         _dispatcher = dispatcher;
     }
 
-    public async Task<ActionResult> ProcessCommand<TCommand>(TCommand command) where TCommand : ICommand
+    public async Task<ActionResult> ProcessCommand<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand
     {
         var validator = _serviceProvider.GetService<IValidator<TCommand>?>();
         if (validator is not null)
         {
-            var validationResult = await validator.ValidateAsync(command);
+            var validationResult = await validator.ValidateAsync(command, cancellationToken);
             if (validationResult.IsValid is false)
             {
                 return validationResult.ToActionResult();
             }
         }
 
-        var commandResult = await _dispatcher.Send(command);
+        var commandResult = await _dispatcher.Send(command, cancellationToken);
 
         return commandResult.ToActionResult();
     }
 
-    public async Task<ActionResult> ProcessQuery<TResult>(IQuery<TResult> query)
+    public async Task<ActionResult> ProcessQuery<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
     {
-        var queryResult = await _dispatcher.Get(query);
+        var queryResult = await _dispatcher.Get(query, cancellationToken);
 
         return queryResult.ToActionResult();
     }

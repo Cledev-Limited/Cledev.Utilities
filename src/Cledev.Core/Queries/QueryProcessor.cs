@@ -14,7 +14,7 @@ public class QueryProcessor : IQueryProcessor
         _serviceProvider = serviceProvider;
     }
 
-    public async Task<Result<TResult>> Process<TResult>(IQuery<TResult>? query)
+    public async Task<Result<TResult>> Process<TResult>(IQuery<TResult>? query, CancellationToken cancellationToken = default)
     {
         if (query is null)
         {
@@ -26,7 +26,7 @@ public class QueryProcessor : IQueryProcessor
         var handler = (QueryHandlerWrapperBase<TResult>)QueryHandlerWrappers.GetOrAdd(queryType,
             t => Activator.CreateInstance(typeof(QueryHandlerWrapper<,>).MakeGenericType(queryType, typeof(TResult))))!;
 
-        var result = await handler.Handle(query, _serviceProvider);
+        var result = await handler.Handle(query, _serviceProvider, cancellationToken);
 
         return result;
     }

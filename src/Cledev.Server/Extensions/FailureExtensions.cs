@@ -7,16 +7,17 @@ public static class FailureExtensions
 {
     public static ActionResult ToActionResult(this Failure failure)
     {
-        var (failureCode, title, description) = failure;
+        var (errorCode, title, description, type) = failure;
 
         var problemDetails = new ProblemDetails
         {
-            Title = title ?? failureCode,
-            Detail = description ?? failureCode,
-            Status = failureCode.ToStatusCode()
+            Title = title ?? errorCode,
+            Detail = description ?? errorCode,
+            Type = type ?? errorCode,
+            Status = errorCode.ToStatusCode()
         };
 
-        return failureCode switch
+        return errorCode switch
         {
             ErrorCodes.NotFound => new NotFoundObjectResult(problemDetails),
             ErrorCodes.Unauthorized => new UnauthorizedObjectResult(problemDetails),
@@ -24,9 +25,9 @@ public static class FailureExtensions
         };
     }
 
-    private static int ToStatusCode(this string failureCode)
+    private static int ToStatusCode(this string errorCode)
     {
-        return failureCode switch
+        return errorCode switch
         {
             ErrorCodes.NotFound => 404,
             ErrorCodes.Unauthorized => 401,

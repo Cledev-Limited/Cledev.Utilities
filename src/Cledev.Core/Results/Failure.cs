@@ -3,7 +3,7 @@ using FluentValidation.Results;
 
 namespace Cledev.Core.Results;
 
-public record Failure(string ErrorCode = ErrorCodes.Error, string? Title = null, string? Description = null);
+public record Failure(string ErrorCode = ErrorCodes.Error, string? Title = null, string? Description = null, string? Type = null);
 
 public static class FailureExtensions
 {
@@ -18,6 +18,9 @@ public static class FailureExtensions
 
     public static Failure WithDescription(this Failure failure, ValidationResult validationResult) => 
         failure with { Description = validationResult.Errors.ToErrorMessage() };
+
+    public static Failure WithType(this Failure failure, string type) =>
+        failure with { Type = type };
 }
 
 public static class ErrorCodes

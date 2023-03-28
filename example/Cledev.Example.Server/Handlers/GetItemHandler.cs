@@ -18,9 +18,9 @@ public class GetItemHandler : IQueryHandler<GetItem, GetItemResponse>
         _cacheManager = cacheManager;
     }
 
-    public async Task<Result<GetItemResponse>> Handle(GetItem query)
+    public async Task<Result<GetItemResponse>> Handle(GetItem query, CancellationToken cancellationToken)
     {
-        var item = await _dbContext.Items.SingleOrDefaultAsync(item => item.Id == query.Id);
+        var item = await _dbContext.Items.SingleOrDefaultAsync(item => item.Id == query.Id, cancellationToken);
 
         if (item is null)
         {

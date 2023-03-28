@@ -17,13 +17,13 @@ public class CacheHandlers :
         _cacheManager = cacheManager;
     }
 
-    public async Task<Result> Handle(ItemCreated @event) => 
+    public async Task<Result> Handle(ItemCreated @event, CancellationToken cancellationToken) => 
         await ClearItemsCache();
 
-    public async Task<Result> Handle(ItemDeleted @event) => 
+    public async Task<Result> Handle(ItemDeleted @event, CancellationToken cancellationToken) => 
         await ClearItemsCache();
 
-    public async Task<Result> Handle(ItemUpdated @event) => 
+    public async Task<Result> Handle(ItemUpdated @event, CancellationToken cancellationToken) => 
         await ClearItemsCache();
 
     private async Task<Result> ClearItemsCache()

@@ -21,9 +21,9 @@ public class Dispatcher : IDispatcher
         _objectFactory = objectFactory;
     }
 
-    public async Task<Result> Send<TCommand>(TCommand command) where TCommand : ICommand
+    public async Task<Result> Send<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand
     {
-        var commandResult = await _commandSender.Send(command);
+        var commandResult = await _commandSender.Send(command, cancellationToken);
 
         return await commandResult.Match(HandleSuccess, HandleFailure);
 
@@ -40,7 +40,7 @@ public class Dispatcher : IDispatcher
             foreach (var @event in events)
             {
                 var concreteEvent = _objectFactory.CreateConcreteObject(@event);
-                var task = _eventPublisher.Publish(concreteEvent);
+                var task = _eventPublisher.Publish(concreteEvent, cancellationToken);
                 tasks.Add(task);
             }
 
@@ -59,13 +59,13 @@ public class Dispatcher : IDispatcher
         }
     }
 
-    public async Task<Result<TResult>> Get<TResult>(IQuery<TResult> query)
+    public async Task<Result<TResult>> Get<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
     {
-        return await _queryProcessor.Process(query);
+        return await _queryProcessor.Process(query, cancellationToken);
     }
 
-    public async Task<Result> Publish<TEvent>(TEvent @event) where TEvent : IEvent
+    public async Task<Result> Publish<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : IEvent
     {
-        return await _eventPublisher.Publish(@event);
+        return await _eventPublisher.Publish(@event, cancellationToken);
     }
 }

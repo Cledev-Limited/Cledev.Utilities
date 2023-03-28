@@ -12,7 +12,7 @@ public class EventPublisher : IEventPublisher
         _serviceProvider = serviceProvider;
     }
 
-    public async Task<Result> Publish<TEvent>(TEvent? @event) where TEvent : IEvent
+    public async Task<Result> Publish<TEvent>(TEvent? @event, CancellationToken cancellationToken = default) where TEvent : IEvent
     {
         if (@event is null)
         {
@@ -21,7 +21,7 @@ public class EventPublisher : IEventPublisher
 
         var handlers = _serviceProvider.GetServices<IEventHandler<TEvent>>();
 
-        var tasks = handlers.Select(handler => handler.Handle(@event)).ToList();
+        var tasks = handlers.Select(handler => handler.Handle(@event, cancellationToken)).ToList();
 
         var results = await Task.WhenAll(tasks);
         if (results.Any(result => result.IsFailure))

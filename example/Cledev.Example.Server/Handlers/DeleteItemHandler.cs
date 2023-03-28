@@ -12,9 +12,9 @@ public class DeleteItemHandler : ICommandHandler<DeleteItem>
 
     public DeleteItemHandler(ApplicationDbContext dbContext) => _dbContext = dbContext;
 
-    public async Task<Result> Handle(DeleteItem command)
+    public async Task<Result> Handle(DeleteItem command, CancellationToken cancellationToken)
     {
-        var item = await _dbContext.Items.SingleOrDefaultAsync(item => item.Id == command.Id);
+        var item = await _dbContext.Items.SingleOrDefaultAsync(item => item.Id == command.Id, cancellationToken);
 
         if (item is null)
         {
@@ -23,7 +23,7 @@ public class DeleteItemHandler : ICommandHandler<DeleteItem>
 
         _dbContext.Items.Remove(item);
 
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         var itemDeleted = new ItemDeleted(item.Id);
 

@@ -12,7 +12,7 @@ public class CommandSender : ICommandSender
         _serviceProvider = serviceProvider;
     }
 
-    public async Task<Result> Send<TCommand>(TCommand? command) where TCommand : ICommand
+    public async Task<Result> Send<TCommand>(TCommand? command, CancellationToken cancellationToken = default) where TCommand : ICommand
     {
         if (command is null)
         {
@@ -26,6 +26,6 @@ public class CommandSender : ICommandSender
             return Result.Fail(ErrorCodes.Error, title: "Handler not found", description: $"Handler not found for command of type {typeof(TCommand)}");
         }
 
-        return await handler.Handle(command);
+        return await handler.Handle(command, cancellationToken);
     }
 }

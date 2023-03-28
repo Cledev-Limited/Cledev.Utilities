@@ -18,11 +18,11 @@ public class GetAllItemsHandler : IQueryHandler<GetAllItems, GetAllItemsResponse
         _cacheManager = cacheManager;
     }
 
-    public async Task<Result<GetAllItemsResponse>> Handle(GetAllItems query)
+    public async Task<Result<GetAllItemsResponse>> Handle(GetAllItems query, CancellationToken cancellationToken)
     {
         async Task<GetAllItemsResponse?> AcquireAsync()
         {
-            var items = await _dbContext.Items.ToListAsync();
+            var items = await _dbContext.Items.ToListAsync(cancellationToken);
 
             return new GetAllItemsResponse
             {

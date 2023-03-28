@@ -12,9 +12,9 @@ public class UpdateItemHandler : ICommandHandler<UpdateItem>
 
     public UpdateItemHandler(ApplicationDbContext dbContext) => _dbContext = dbContext;
 
-    public async Task<Result> Handle(UpdateItem command)
+    public async Task<Result> Handle(UpdateItem command, CancellationToken cancellationToken)
     {
-        var item = await _dbContext.Items.SingleOrDefaultAsync(item => item.Id == command.Id);
+        var item = await _dbContext.Items.SingleOrDefaultAsync(item => item.Id == command.Id, cancellationToken);
 
         if (item is null)
         {
@@ -23,7 +23,7 @@ public class UpdateItemHandler : ICommandHandler<UpdateItem>
 
         item.Update(command.Name, command.Description);
 
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         var itemUpdated = new ItemUpdated(item.Id, item.Name, item.Description);
 

@@ -4,12 +4,12 @@ namespace Cledev.Core.Utilities;
 
 public interface ISlugGenerator
 {
-    Task<string> GenerateSlug(string name, Func<string, Task<bool>> getAny, int maxRepeat = 5, Func<Task<string>>? getDefault = null);
+    Task<string> GenerateSlug(string text, Func<string, Task<bool>> getAny, int maxRepeat = 5, Func<Task<string>>? getDefault = null);
 }
 
 public class SlugGenerator : ISlugGenerator
 {
-    public async Task<string> GenerateSlug(string name, Func<string, Task<bool>> getAny, int maxRepeat = 5, Func<Task<string>>? getDefault = null)
+    public async Task<string> GenerateSlug(string text, Func<string, Task<bool>> getAny, int maxRepeat = 5, Func<Task<string>>? getDefault = null)
     {
         var slug = string.Empty;
         var exists = true;
@@ -18,7 +18,7 @@ public class SlugGenerator : ISlugGenerator
         while (exists && repeat < maxRepeat)
         {
             var suffix = repeat > 0 ? $"-{repeat}" : string.Empty;
-            slug = $"{name.ToSlug()}{suffix}";
+            slug = $"{text.ToSlug()}{suffix}";
             exists = await getAny(slug);
             repeat++;
         }
