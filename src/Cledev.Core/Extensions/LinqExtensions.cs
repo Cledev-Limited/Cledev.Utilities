@@ -1,15 +1,33 @@
-﻿using System.Linq.Expressions;
+﻿using Cledev.Core.Models.Queries;
+using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Cledev.Core.Utilities.Queries;
+namespace Cledev.Core.Extensions;
 
-/// <summary>
-/// https://stackoverflow.com/questions/34906437/how-to-construct-order-by-expression-dynamically-in-entity-framework
-/// </summary>
-public static class QueryExtensions
+public static class LinqExtensions
 {
-    public static IQueryable<T> OrderBy<T>(this IQueryable<T> source, QueryOptions options)
+    public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
     {
+        HashSet<TKey> seenKeys = new();
+        foreach (var element in source)
+        {
+            if (seenKeys.Add(keySelector(element)))
+            {
+                yield return element;
+            }
+        }
+    }
+
+    /// <summary>
+    /// https://stackoverflow.com/questions/34906437/how-to-construct-order-by-expression-dynamically-in-entity-framework
+    /// </summary>
+    public static IQueryable<T>? OrderBy<T>(this IQueryable<T>? source, QueryOptions options)
+    {
+        if (source is null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+
         var propertyName = options.OrderByField;
         var direction = options.OrderByDirection;
 
@@ -18,7 +36,7 @@ public static class QueryExtensions
             source = direction == OrderByDirectionType.Asc
                 ? source.OrderByProperty(propertyName)
                 : source.OrderByPropertyDescending(propertyName);
-        };
+        }
 
         return source;
     }
@@ -39,8 +57,13 @@ public static class QueryExtensions
             BindingFlags.Instance) is not null;
     }
 
-    private static IQueryable<T> OrderByProperty<T>(this IQueryable<T> source, string propertyName)
+    private static IQueryable<T>? OrderByProperty<T>(this IQueryable<T>? source, string propertyName)
     {
+        if (source is null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+
         if (typeof(T).GetProperty(propertyName,
                 BindingFlags.IgnoreCase |
                 BindingFlags.Public |
@@ -57,8 +80,13 @@ public static class QueryExtensions
         return (IQueryable<T>)ret;
     }
 
-    private static IQueryable<T> OrderByPropertyDescending<T>(this IQueryable<T> source, string propertyName)
+    private static IQueryable<T>? OrderByPropertyDescending<T>(this IQueryable<T>? source, string propertyName)
     {
+        if (source is null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+
         if (typeof(T).GetProperty(propertyName,
                 BindingFlags.IgnoreCase |
                 BindingFlags.Public |

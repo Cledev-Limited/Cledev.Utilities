@@ -1,11 +1,10 @@
-﻿namespace Cledev.Core.Utilities.Queries;
+﻿namespace Cledev.Core.Models.Queries;
 
 public class QueryOptions
 {
     private const int DefaultPageSize = 10;
     public string? Search { get; set; }
     public string? OrderByField { get; set; }
-
     public OrderByDirectionType? OrderByDirection { get; set; }
     public int CurrentPage { get; set; }
     public int PageSize { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace Cledev.Core.Utilities.Queries;
+﻿namespace Cledev.Core.Models.Queries;
 
 public enum OrderByDirectionType
 {

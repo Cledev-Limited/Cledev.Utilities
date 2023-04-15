@@ -1,4 +1,4 @@
-﻿namespace Cledev.Core.Utilities;
+﻿namespace Cledev.Core.Services;
 
 public interface IDateTimeProvider
 {
