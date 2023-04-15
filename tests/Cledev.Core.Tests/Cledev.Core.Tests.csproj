@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\src\Cledev.Core\Cledev.Core.csproj" />
+	  <ProjectReference Include="..\..\src\Cledev.Core\Cledev.Core.csproj" />
 	</ItemGroup>
 
 </Project>
