@@ -8,7 +8,7 @@ serviceCollection.AddCledevCore(typeof(StreamRequest));
 var serviceProvider = serviceCollection.BuildServiceProvider();
 var dispatcher = serviceProvider.GetRequiredService<IDispatcher>();
 
-await foreach (var response in dispatcher.CreateStream(new StreamRequest { Text = "Start" }))
+await foreach (var response in dispatcher.CreateStream(new StreamRequest()))
 {
     Console.Write(response.Text);
 }

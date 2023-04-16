@@ -37,6 +37,7 @@ public static class ServiceCollectionExtensions
 
         var mapperConfiguration = new MapperConfiguration(configuration =>
         {
+            configuration.ShouldMapMethod = (m => false);
             foreach (var type in types)
             {
                 var typesToMap = type.Assembly.GetTypes()
