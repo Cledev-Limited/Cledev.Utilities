@@ -3,6 +3,7 @@ using Cledev.Core.Events;
 using Cledev.Core.Mapping;
 using Cledev.Core.Queries;
 using Cledev.Core.Results;
+using Cledev.Core.Streams;
 
 namespace Cledev.Core;
 
@@ -11,13 +12,15 @@ public class Dispatcher : IDispatcher
     private readonly ICommandSender _commandSender;
     private readonly IQueryProcessor _queryProcessor;
     private readonly IEventPublisher _eventPublisher;
+    private readonly IStreamCreator _streamCreator;
     private readonly IObjectFactory _objectFactory;
 
-    public Dispatcher(ICommandSender commandSender, IQueryProcessor queryProcessor, IEventPublisher eventPublisher, IObjectFactory objectFactory)
+    public Dispatcher(ICommandSender commandSender, IQueryProcessor queryProcessor, IEventPublisher eventPublisher, IStreamCreator streamCreator, IObjectFactory objectFactory)
     {
         _commandSender = commandSender;
         _queryProcessor = queryProcessor;
         _eventPublisher = eventPublisher;
+        _streamCreator = streamCreator;
         _objectFactory = objectFactory;
     }
 
@@ -67,5 +70,10 @@ public class Dispatcher : IDispatcher
     public async Task<Result> Publish<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : IEvent
     {
         return await _eventPublisher.Publish(@event, cancellationToken);
+    }
+
+    public IAsyncEnumerable<TResponse> CreateStream<TResponse>(IStreamRequest<TResponse> request, CancellationToken cancellationToken = default)
+    {
+        return _streamCreator.Create(request, cancellationToken);
     }
 }
