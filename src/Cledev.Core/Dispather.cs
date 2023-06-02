@@ -37,15 +37,11 @@ public class Dispatcher : IDispatcher
             {
                 return success;
             }
-
-            var tasks = new List<Task<Result>>();
-
-            foreach (var @event in events)
-            {
-                var concreteEvent = _objectFactory.CreateConcreteObject(@event);
-                var task = _eventPublisher.Publish(concreteEvent, cancellationToken);
-                tasks.Add(task);
-            }
+            
+            var tasks = events
+                .Select(@event => _objectFactory.CreateConcreteObject(@event))
+                .Select(concreteEvent => _eventPublisher.Publish(concreteEvent, cancellationToken))
+                .Select(task => (Task<Result>) task).ToList();
 
             var results = await Task.WhenAll(tasks);
             if (results.Any(result => result.IsFailure))

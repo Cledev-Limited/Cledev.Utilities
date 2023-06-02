@@ -10,7 +10,7 @@ internal class QueryHandlerWrapper<TQuery, TResult> : QueryHandlerWrapperBase<TR
 
         if (handler == null)
         {
-            return Result<TResult>.Fail(ErrorCodes.Error, title: "Handler not found", description: $"Handler not found for query of type {typeof(TQuery)}");
+            return Result<TResult>.Fail(title: "Handler not found", description: $"Handler not found for query of type {typeof(TQuery)}");
         }
 
         return await handler.Handle((TQuery) query, cancellationToken);

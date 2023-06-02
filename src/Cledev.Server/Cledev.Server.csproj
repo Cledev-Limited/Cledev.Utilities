@@ -1,32 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-	  <TargetFramework>net7.0</TargetFramework>
-	  <ImplicitUsings>enable</ImplicitUsings>
-	  <Nullable>enable</Nullable>
-	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-	  <Authors>Luca Briguglia</Authors>
-	  <Company>Cledev Limited</Company>
-	  <Description>A collection of tools for ASP.NET Web API projects.</Description>
-	  <Copyright>Luca Briguglia</Copyright>
-	  <PackageProjectUrl>https://github.com/lucabriguglia/Cledev</PackageProjectUrl>
-	  <RepositoryUrl>https://github.com/lucabriguglia/Cledev</RepositoryUrl>
-	  <PackageTags>.net;.net core;utilities;extensions;mediator;cqrs</PackageTags>
-	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
-	  <Version>1.2.0</Version>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <Authors>Luca Briguglia</Authors>
+        <Company>Cledev Limited</Company>
+        <Description>A collection of tools for ASP.NET Web API projects.</Description>
+        <Copyright>Luca Briguglia</Copyright>
+        <PackageProjectUrl>https://github.com/lucabriguglia/Cledev</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/lucabriguglia/Cledev</RepositoryUrl>
+        <PackageTags>.net;.net core;utilities;extensions;mediator;cqrs</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Version>1.2.1</Version>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="FluentValidation" Version="10.4.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.12" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-		<PackageReference Include="OneOf" Version="3.0.223" />
-		<PackageReference Include="Scrutor" Version="4.2.0" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="FluentValidation" Version="10.4.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.12"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0"/>
+        <PackageReference Include="OneOf" Version="3.0.223"/>
+        <PackageReference Include="Scrutor" Version="4.2.0"/>
+    </ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\Cledev.Core\Cledev.Core.csproj" />
-	</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Cledev.Core\Cledev.Core.csproj"/>
+    </ItemGroup>
 
 </Project>

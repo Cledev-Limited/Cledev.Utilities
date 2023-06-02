@@ -1,29 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-	  <TargetFramework>net7.0</TargetFramework>
-	  <ImplicitUsings>enable</ImplicitUsings>
-	  <Nullable>enable</Nullable>
-	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-	  <Authors>Luca Briguglia</Authors>
-	  <Company>Cledev Limited</Company>
-	  <Description>A collection of tools for Blazor WebAssembly Client projects.</Description>
-	  <Copyright>Luca Briguglia</Copyright>
-	  <PackageProjectUrl>https://github.com/lucabriguglia/Cledev</PackageProjectUrl>
-	  <RepositoryUrl>https://github.com/lucabriguglia/Cledev</RepositoryUrl>
-	  <PackageTags>.net;.net core;utilities;extensions;mediator;cqrs</PackageTags>
-	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
-	  <Version>1.2.0</Version>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <Authors>Luca Briguglia</Authors>
+        <Company>Cledev Limited</Company>
+        <Description>A collection of tools for Blazor WebAssembly Client projects.</Description>
+        <Copyright>Luca Briguglia</Copyright>
+        <PackageProjectUrl>https://github.com/lucabriguglia/Cledev</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/lucabriguglia/Cledev</RepositoryUrl>
+        <PackageTags>.net;.net core;utilities;extensions;mediator;cqrs</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Version>1.2.1</Version>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="7.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
-		<PackageReference Include="Scrutor" Version="4.2.0" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0"/>
+        <PackageReference Include="Scrutor" Version="4.2.0"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-  </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Extensions\"/>
+    </ItemGroup>
 
 </Project>

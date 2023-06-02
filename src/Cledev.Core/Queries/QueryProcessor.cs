@@ -14,13 +14,13 @@ public class QueryProcessor : IQueryProcessor
         _serviceProvider = serviceProvider;
     }
 
-    public async Task<Result<TResult>> Process<TResult>(IQuery<TResult>? query, CancellationToken cancellationToken = default)
+    public async Task<Result<TResult>> Process<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
     {
         if (query is null)
         {
-            return Result<TResult>.Fail(ErrorCodes.Error, title: "Null Argument", description: $"Query of type {typeof(IQuery<TResult>)} is null");
+            throw new ArgumentNullException(nameof(query));
         }
-
+        
         var queryType = query.GetType();
 
         var handler = (QueryHandlerWrapperBase<TResult>)QueryHandlerWrappers.GetOrAdd(queryType,

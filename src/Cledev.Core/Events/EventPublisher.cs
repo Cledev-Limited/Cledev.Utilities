@@ -12,13 +12,8 @@ public class EventPublisher : IEventPublisher
         _serviceProvider = serviceProvider;
     }
 
-    public async Task<Result> Publish<TEvent>(TEvent? @event, CancellationToken cancellationToken = default) where TEvent : IEvent
+    public async Task<Result> Publish<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : IEvent
     {
-        if (@event is null)
-        {
-            return Result.Fail(ErrorCodes.Error, title: "Null Argument", description: "Event is null");
-        }
-
         var handlers = _serviceProvider.GetServices<IEventHandler<TEvent>>();
 
         var tasks = handlers.Select(handler => handler.Handle(@event, cancellationToken)).ToList();
