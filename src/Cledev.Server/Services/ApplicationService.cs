@@ -8,18 +8,18 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Cledev.Server.Services;
 
-public interface IControllerService
+public interface IApplicationService
 {
     Task<ActionResult> ProcessCommand<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand;
     Task<ActionResult> ProcessQuery<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default);
 }
 
-public class ControllerService : IControllerService
+public class ApplicationService : IApplicationService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IDispatcher _dispatcher;
 
-    public ControllerService(IServiceProvider serviceProvider, IDispatcher dispatcher)
+    public ApplicationService(IServiceProvider serviceProvider, IDispatcher dispatcher)
     {
         _serviceProvider = serviceProvider;
         _dispatcher = dispatcher;

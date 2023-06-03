@@ -10,13 +10,13 @@ namespace Cledev.Examples.Server.Controllers;
 [Route("[controller]")]
 public class ItemsController : ControllerBase
 {
-    private readonly IControllerService _controllerService;
+    private readonly IApplicationService _applicationService;
     private readonly ICreateItemValidationRules _createItemValidationRules;
     private readonly IUpdateItemValidationRules _updateItemValidationRules;
 
-    public ItemsController(IControllerService controllerService, ICreateItemValidationRules createItemValidationRules, IUpdateItemValidationRules updateItemValidationRules)
+    public ItemsController(IApplicationService applicationService, ICreateItemValidationRules createItemValidationRules, IUpdateItemValidationRules updateItemValidationRules)
     {
-        _controllerService = controllerService;
+        _applicationService = applicationService;
         _createItemValidationRules = createItemValidationRules;
         _updateItemValidationRules = updateItemValidationRules;
     }
@@ -24,45 +24,45 @@ public class ItemsController : ControllerBase
     [ProducesResponseType(typeof(GetAllItemsResponse), StatusCodes.Status200OK)]
     [HttpGet]
     public async Task<ActionResult> Get() => 
-        await _controllerService.ProcessQuery(new GetAllItems());
+        await _applicationService.ProcessQuery(new GetAllItems());
 
     [ProducesResponseType(typeof(GetItemResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult> Get([FromRoute] Guid id) =>
-        await _controllerService.ProcessQuery(new GetItem(id));
+        await _applicationService.ProcessQuery(new GetItem(id));
 
     [ProducesResponseType(typeof(CreateItem), StatusCodes.Status200OK)]
     [HttpGet("create-item")]
     public async Task<ActionResult> GetCreateItem() =>
-        await _controllerService.ProcessQuery(new GetCreateItem());
+        await _applicationService.ProcessQuery(new GetCreateItem());
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     [HttpPost]
     public async Task<ActionResult> Post([FromBody] CreateItem command) =>
-        await _controllerService.ProcessCommand(command);
+        await _applicationService.ProcessCommand(command);
 
     [ProducesResponseType(typeof(UpdateItem), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [HttpGet("update-item/{id:guid}")]
     public async Task<ActionResult> GetUpdateItem([FromRoute] Guid id) =>
-        await _controllerService.ProcessQuery(new GetUpdateItem(id));
+        await _applicationService.ProcessQuery(new GetUpdateItem(id));
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     [HttpPut]
     public async Task<ActionResult> Put([FromBody] UpdateItem command) =>
-        await _controllerService.ProcessCommand(command);
+        await _applicationService.ProcessCommand(command);
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> Delete([FromRoute] Guid id) =>
-        await _controllerService.ProcessCommand(new DeleteItem(id));
+        await _applicationService.ProcessCommand(new DeleteItem(id));
 
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
