@@ -10,7 +10,7 @@ internal class StreamRequestHandlerWrapper<TStreamRequest, TResponse> : StreamRe
 
         if (handler == null)
         {
-            throw new Exception($"Handler not found for stream request of type {typeof(TStreamRequest)}");
+            throw new Exception("No stream request handler found for stream request.");
         }
 
         await foreach (var item in handler.Handle((TStreamRequest)streamRequest, cancellationToken))

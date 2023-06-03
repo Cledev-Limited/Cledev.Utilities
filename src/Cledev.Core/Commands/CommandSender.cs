@@ -23,7 +23,7 @@ public class CommandSender : ICommandSender
 
         if (handler is null)
         {
-            return Result.Fail(title: "Handler not found", description: $"Handler not found for command of type {typeof(TCommand)}");
+            throw new Exception("No command handler found for command.");
         }
 
         return await handler.Handle(command, cancellationToken);

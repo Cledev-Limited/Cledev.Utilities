@@ -13,7 +13,7 @@
         <RepositoryUrl>https://github.com/lucabriguglia/Cledev</RepositoryUrl>
         <PackageTags>.net;.net core;utilities;extensions;mediator;cqrs</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <Version>1.4.0</Version>
+        <Version>1.4.1</Version>
     </PropertyGroup>
 
     <ItemGroup>

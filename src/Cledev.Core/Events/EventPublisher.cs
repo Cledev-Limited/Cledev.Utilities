@@ -16,7 +16,13 @@ public class EventPublisher : IEventPublisher
     {
         var handlers = _serviceProvider.GetServices<IEventHandler<TEvent>>();
 
-        var tasks = handlers.Select(handler => handler.Handle(@event, cancellationToken)).ToList();
+        var enumerable = handlers as IEventHandler<TEvent>[] ?? handlers.ToArray();
+        if (enumerable.Any() is false)
+        {
+            return Result.Ok();
+        }
+        
+        var tasks = enumerable.Select(handler => handler.Handle(@event, cancellationToken)).ToList();
 
         var results = await Task.WhenAll(tasks);
         if (results.Any(result => result.IsFailure))
