@@ -1,5 +1,4 @@
-﻿using Cledev.Example.Server.Data;
-using Cledev.Examples.Server.Data;
+﻿using Cledev.Examples.Server.Data;
 using Cledev.Examples.Shared;
 using Microsoft.EntityFrameworkCore;
 

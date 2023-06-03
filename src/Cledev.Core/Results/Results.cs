@@ -15,10 +15,10 @@ public sealed class Result : OneOfBase<Success, Failure>
     public bool IsNotSuccess => IsT1;
     public bool IsFailure => IsT1;
 
-    public Success Success => AsT0;
-    public Failure Failure => AsT1;
+    public Success? Success => IsT0 ? AsT0 : default;
+    public Failure? Failure => IsT1 ? AsT1 : default;
 
-    public IEnumerable<IEvent> Events => AsT0.Events;
+    public IEnumerable<IEvent>? Events => IsT0 ? AsT0.Events : default;
     
     public static Result Ok(Success success) => new(success);
     public static Result Ok(params IEvent[] events) => new(new Success(events));
@@ -41,11 +41,11 @@ public sealed class Result<TResult> : OneOfBase<Success<TResult>, Failure>
     public bool IsNotSuccess => IsT1;
     public bool IsFailure => IsT1;
 
-    public Success<TResult> Success => AsT0;
-    public Failure Failure => AsT1;
+    public Success<TResult>? Success => IsT0 ? AsT0 : default;
+    public Failure? Failure => IsT1 ? AsT1 : default;
     
-    public new TResult? Value => AsT0.Result;
-    public IEnumerable<IEvent> Events => AsT0.Events;
+    public new TResult? Value => IsT0 ? AsT0.Result : default;
+    public IEnumerable<IEvent>? Events => IsT0 ? AsT0.Events : default;
 
     public static Result<TResult> Ok(Success<TResult> success) => new(success);
     public static Result<TResult> Ok(TResult result, params IEvent[] events) => new(new Success<TResult>(result, events));

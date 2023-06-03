@@ -39,6 +39,8 @@ public class ControllerService : IControllerService
 
         var commandResult = await _dispatcher.Send(command, cancellationToken);
 
+        commandResult.UpdateActivityIfNeeded();
+        
         return commandResult.ToActionResult();
     }
 
@@ -46,6 +48,8 @@ public class ControllerService : IControllerService
     {
         var queryResult = await _dispatcher.Get(query, cancellationToken);
 
+        queryResult.UpdateActivityIfNeeded();
+        
         return queryResult.ToActionResult();
     }
 }

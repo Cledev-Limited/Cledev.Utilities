@@ -7,7 +7,7 @@ public static class FailureExtensions
 {
     public static ActionResult ToActionResult(this Failure failure)
     {
-        var (errorCode, title, description, type) = failure;
+        var (errorCode, title, description, type, _) = failure;
 
         var problemDetails = new ProblemDetails
         {

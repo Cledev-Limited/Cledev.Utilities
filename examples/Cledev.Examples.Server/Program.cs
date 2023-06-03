@@ -1,5 +1,4 @@
 using Cledev.Core.Extensions;
-using Cledev.Example.Server.Data;
 using Cledev.Examples.Server.Data;
 using Cledev.Examples.Server.Data.Entities;
 using Cledev.Server.Extensions;
