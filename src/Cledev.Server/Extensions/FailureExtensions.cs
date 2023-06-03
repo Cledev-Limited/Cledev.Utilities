@@ -21,7 +21,9 @@ public static class FailureExtensions
         {
             ErrorCodes.NotFound => new NotFoundObjectResult(problemDetails),
             ErrorCodes.Unauthorized => new UnauthorizedObjectResult(problemDetails),
-            _ => new UnprocessableEntityObjectResult(problemDetails)
+            ErrorCodes.UnprocessableEntity => new UnprocessableEntityObjectResult(problemDetails),
+            ErrorCodes.BadRequest => new BadRequestObjectResult(problemDetails),
+            _ => new BadRequestObjectResult(problemDetails)
         };
     }
 
@@ -31,7 +33,8 @@ public static class FailureExtensions
         {
             ErrorCodes.NotFound => 404,
             ErrorCodes.Unauthorized => 401,
-            ErrorCodes.Error => 422,
+            ErrorCodes.UnprocessableEntity => 422,
+            ErrorCodes.BadRequest => 400,
             _ => 400
         };
     }
