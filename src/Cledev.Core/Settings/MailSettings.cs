@@ -2,9 +2,9 @@
 
 public class MailSettings
 {
-    public string? Mail { get; set; }
-    public string? DisplayName { get; set; }
-    public string? Password { get; set; }
-    public string? Host { get; set; }
-    public int? Port { get; set; }
+    public string Address { get; set; } = null!;
+    public string DisplayName { get; set; } = null!;
+    public string Password { get; set; } = null!;
+    public string Host { get; set; } = null!;
+    public int Port { get; set; }
 }
