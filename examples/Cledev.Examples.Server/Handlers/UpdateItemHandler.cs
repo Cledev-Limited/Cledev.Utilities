@@ -24,9 +24,7 @@ public class UpdateItemHandler : ICommandHandler<UpdateItem>
         item.Update(command.Name, command.Description);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
-
-        var itemUpdated = new ItemUpdated(item.Id, item.Name, item.Description);
-
-        return new Success(itemUpdated);
+        
+        return Result.Ok();
     }
 }

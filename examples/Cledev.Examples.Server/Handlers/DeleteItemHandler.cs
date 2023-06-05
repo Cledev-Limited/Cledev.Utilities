@@ -25,8 +25,6 @@ public class DeleteItemHandler : ICommandHandler<DeleteItem>
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        var itemDeleted = new ItemDeleted(item.Id);
-
-        return new Success(itemDeleted);
+        return Result.Ok();
     }
 }
