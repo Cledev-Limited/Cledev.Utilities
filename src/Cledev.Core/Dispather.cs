@@ -32,7 +32,7 @@ public class Dispatcher : IDispatcher
         return await _queryProcessor.Process(query, cancellationToken);
     }
 
-    public async Task<Result> Publish<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : IEvent
+    public async Task<IEnumerable<Result>> Publish<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : IEvent
     {
         return await _eventPublisher.Publish(@event, cancellationToken);
     }

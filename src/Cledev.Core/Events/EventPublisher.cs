@@ -12,24 +12,12 @@ public class EventPublisher : IEventPublisher
         _serviceProvider = serviceProvider;
     }
 
-    public async Task<Result> Publish<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : IEvent
+    public async Task<IEnumerable<Result>> Publish<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : IEvent
     {
         var handlers = _serviceProvider.GetServices<IEventHandler<TEvent>>();
 
-        var enumerable = handlers as IEventHandler<TEvent>[] ?? handlers.ToArray();
-        if (enumerable.Any() is false)
-        {
-            return Result.Ok();
-        }
-        
-        var tasks = enumerable.Select(handler => handler.Handle(@event, cancellationToken)).ToList();
+        var tasks = handlers.Select(handler => handler.Handle(@event, cancellationToken)).ToList();
 
-        var results = await Task.WhenAll(tasks);
-        if (results.Any(result => result.IsFailure))
-        {
-            // TODO: Handle event publisher failed results
-        }
-        
-        return Result.Ok();
+        return await Task.WhenAll(tasks);
     }
 }
