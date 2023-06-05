@@ -20,8 +20,6 @@ public class CreateItemHandler : ICommandHandler<CreateItem>
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        var itemCreated = new ItemCreated(item.Id, item.Name, item.Description);
-
-        return new Success(itemCreated);
+        return Result.Ok();
     }
 }

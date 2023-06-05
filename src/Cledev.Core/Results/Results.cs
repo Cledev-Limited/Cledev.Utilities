@@ -1,4 +1,3 @@
-using Cledev.Core.Events;
 using OneOf;
 
 namespace Cledev.Core.Results;
@@ -9,8 +8,7 @@ public sealed class Result : OneOfBase<Success, Failure>
 
     public static implicit operator Result(Success success) => new(success);
     public static implicit operator Result(Failure failure) => new(failure);
-    public static implicit operator Result(IEvent[] events) => new(new Success(events));
-    
+
     public bool IsSuccess => IsT0;
     public bool IsNotSuccess => IsT1;
     public bool IsFailure => IsT1;
@@ -18,10 +16,8 @@ public sealed class Result : OneOfBase<Success, Failure>
     public Success? Success => IsT0 ? AsT0 : default;
     public Failure? Failure => IsT1 ? AsT1 : default;
 
-    public IEnumerable<IEvent>? Events => IsT0 ? AsT0.Events : default;
-    
+    public static Result Ok() => new(new Success());
     public static Result Ok(Success success) => new(success);
-    public static Result Ok(params IEvent[] events) => new(new Success(events));
     public static Result Fail(string errorCode = ErrorCodes.Error, string? title = null, string? description = null, string? type = null) => new(new Failure(errorCode, title, description, type));
 
     public bool TryPickSuccess(out Success success, out Failure failure) => TryPickT0(out success, out failure);
@@ -35,8 +31,7 @@ public sealed class Result<TResult> : OneOfBase<Success<TResult>, Failure>
     public static implicit operator Result<TResult>(Success<TResult> success) => new(success);
     public static implicit operator Result<TResult>(Failure failure) => new(failure);
     public static implicit operator Result<TResult>(TResult result) => new(new Success<TResult>(result));
-    public static implicit operator Result<TResult>(IEvent[] events) => new(new Success<TResult>(events));
-    
+
     public bool IsSuccess => IsT0;
     public bool IsNotSuccess => IsT1;
     public bool IsFailure => IsT1;
@@ -45,10 +40,9 @@ public sealed class Result<TResult> : OneOfBase<Success<TResult>, Failure>
     public Failure? Failure => IsT1 ? AsT1 : default;
     
     public new TResult? Value => IsT0 ? AsT0.Result : default;
-    public IEnumerable<IEvent>? Events => IsT0 ? AsT0.Events : default;
 
+    public static Result<TResult> Ok(TResult result) => new(new Success<TResult>(result));
     public static Result<TResult> Ok(Success<TResult> success) => new(success);
-    public static Result<TResult> Ok(TResult result, params IEvent[] events) => new(new Success<TResult>(result, events));
     public static Result<TResult> Fail(string errorCode = ErrorCodes.Error, string? title = null, string? description = null, string? type = null) => new(new Failure(errorCode, title, description, type));
 
     public bool TryPickSuccess(out Success<TResult> success, out Failure failure) => TryPickT0(out success, out failure);

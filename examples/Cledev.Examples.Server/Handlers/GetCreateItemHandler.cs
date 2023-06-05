@@ -1,5 +1,4 @@
-﻿using Cledev.Core.Events;
-using Cledev.Core.Queries;
+﻿using Cledev.Core.Queries;
 using Cledev.Core.Results;
 using Cledev.Examples.Shared;
 
@@ -25,7 +24,6 @@ public class GetCreateItemHandler : IQueryHandler<GetCreateItem, CreateItem>
         return new Failure(ErrorCodes.NotFound, "Item", "Item not found");
 
         return new CreateItem();
-        return Array.Empty<IEvent>();
     }
 
     public async Task<Result> HandleTest(GetCreateItem query)
@@ -37,7 +35,5 @@ public class GetCreateItemHandler : IQueryHandler<GetCreateItem, CreateItem>
 
         return new Success();
         return new Failure(ErrorCodes.NotFound, "Item", "Item not found");
-
-        return Array.Empty<IEvent>();
     }
 }
