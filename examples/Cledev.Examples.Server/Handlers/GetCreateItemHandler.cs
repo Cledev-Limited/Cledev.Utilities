@@ -1,5 +1,4 @@
-﻿using Cledev.Core.Events;
-using Cledev.Core.Queries;
+﻿using Cledev.Core.Queries;
 using Cledev.Core.Results;
 using Cledev.Examples.Shared;
 
