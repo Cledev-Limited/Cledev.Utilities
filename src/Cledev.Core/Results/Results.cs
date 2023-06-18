@@ -18,33 +18,35 @@ public sealed class Result : OneOfBase<Success, Failure>
 
     public static Result Ok() => new(new Success());
     public static Result Ok(Success success) => new(success);
-    public static Result Fail(string errorCode = ErrorCodes.Error, string? title = null, string? description = null, string? type = null) => new(new Failure(errorCode, title, description, type));
-
+    public static Result Fail(string errorCode = ErrorCodes.Error, string? title = null, string? description = null, string? type = null, IDictionary<string, string>? tags = null) => new(new Failure(errorCode, title, description, type, tags));
+    public static Result Fail(Failure failure) => new(failure);
+    
     public bool TryPickSuccess(out Success success, out Failure failure) => TryPickT0(out success, out failure);
     public bool TryPickFailure(out Failure failure, out Success success) => TryPickT1(out failure, out success);
 }
 
-public sealed class Result<TResult> : OneOfBase<Success<TResult>, Failure>
+public sealed class Result<TValue> : OneOfBase<Success<TValue>, Failure>
 {
-    private Result(OneOf<Success<TResult>, Failure> input) : base(input) { }
+    private Result(OneOf<Success<TValue>, Failure> input) : base(input) { }
 
-    public static implicit operator Result<TResult>(Success<TResult> success) => new(success);
-    public static implicit operator Result<TResult>(Failure failure) => new(failure);
-    public static implicit operator Result<TResult>(TResult result) => new(new Success<TResult>(result));
+    public static implicit operator Result<TValue>(Success<TValue> success) => new(success);
+    public static implicit operator Result<TValue>(Failure failure) => new(failure);
+    public static implicit operator Result<TValue>(TValue result) => new(new Success<TValue>(result));
 
     public bool IsSuccess => IsT0;
     public bool IsNotSuccess => IsT1;
     public bool IsFailure => IsT1;
 
-    public Success<TResult>? Success => IsT0 ? AsT0 : default;
+    public Success<TValue>? Success => IsT0 ? AsT0 : default;
     public Failure? Failure => IsT1 ? AsT1 : default;
     
-    public new TResult? Value => IsT0 ? AsT0.Result : default;
+    public new TValue? Value => IsT0 ? AsT0.Result : default;
 
-    public static Result<TResult> Ok(TResult result) => new(new Success<TResult>(result));
-    public static Result<TResult> Ok(Success<TResult> success) => new(success);
-    public static Result<TResult> Fail(string errorCode = ErrorCodes.Error, string? title = null, string? description = null, string? type = null) => new(new Failure(errorCode, title, description, type));
+    public static Result<TValue> Ok(TValue result) => new(new Success<TValue>(result));
+    public static Result<TValue> Ok(Success<TValue> success) => new(success);
+    public static Result<TValue> Fail(string errorCode = ErrorCodes.Error, string? title = null, string? description = null, string? type = null, IDictionary<string, string>? tags = null) => new(new Failure(errorCode, title, description, type, tags));
+    public static Result<TValue> Fail(Failure failure) => new(failure);
 
-    public bool TryPickSuccess(out Success<TResult> success, out Failure failure) => TryPickT0(out success, out failure);
-    public bool TryPickFailure(out Failure failure, out Success<TResult> success) => TryPickT1(out failure, out success);
+    public bool TryPickSuccess(out Success<TValue> success, out Failure failure) => TryPickT0(out success, out failure);
+    public bool TryPickFailure(out Failure failure, out Success<TValue> success) => TryPickT1(out failure, out success);
 }

@@ -23,7 +23,7 @@ public static class FailureExtensions
             ErrorCodes.Unauthorized => new UnauthorizedObjectResult(problemDetails),
             ErrorCodes.UnprocessableEntity => new UnprocessableEntityObjectResult(problemDetails),
             ErrorCodes.BadRequest => new BadRequestObjectResult(problemDetails),
-            _ => new BadRequestObjectResult(problemDetails)
+            _ => new UnprocessableEntityObjectResult(problemDetails)
         };
     }
 
@@ -35,7 +35,7 @@ public static class FailureExtensions
             ErrorCodes.Unauthorized => 401,
             ErrorCodes.UnprocessableEntity => 422,
             ErrorCodes.BadRequest => 400,
-            _ => 400
+            _ => 422
         };
     }
 }
