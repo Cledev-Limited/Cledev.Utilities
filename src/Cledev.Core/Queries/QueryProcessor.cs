@@ -23,8 +23,8 @@ public class QueryProcessor : IQueryProcessor
         
         var queryType = query.GetType();
 
-        var handler = (QueryHandlerWrapperBase<TResult>)QueryHandlerWrappers.GetOrAdd(queryType,
-            _ => Activator.CreateInstance(typeof(QueryHandlerWrapper<,>).MakeGenericType(queryType, typeof(TResult))))!;
+        var handler = (QueryHandlerWrapperBase<TResult>)QueryHandlerWrappers.GetOrAdd(queryType, _ => 
+            Activator.CreateInstance(typeof(QueryHandlerWrapper<,>).MakeGenericType(queryType, typeof(TResult))))!;
 
         var result = await handler.Handle(query, _serviceProvider, cancellationToken);
 
