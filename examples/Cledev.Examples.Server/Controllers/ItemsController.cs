@@ -24,45 +24,45 @@ public class ItemsController : ControllerBase
     [ProducesResponseType(typeof(GetAllItemsResponse), StatusCodes.Status200OK)]
     [HttpGet]
     public async Task<ActionResult> Get() => 
-        await _applicationService.ProcessQuery(new GetAllItems());
+        await _applicationService.ProcessRequest(new GetAllItems());
 
     [ProducesResponseType(typeof(GetItemResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult> Get([FromRoute] Guid id) =>
-        await _applicationService.ProcessQuery(new GetItem(id));
+        await _applicationService.ProcessRequest(new GetItem(id));
 
     [ProducesResponseType(typeof(CreateItem), StatusCodes.Status200OK)]
     [HttpGet("create-item")]
     public async Task<ActionResult> GetCreateItem() =>
-        await _applicationService.ProcessQuery(new GetCreateItem());
+        await _applicationService.ProcessRequest(new GetCreateItem());
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     [HttpPost]
     public async Task<ActionResult> Post([FromBody] CreateItem command) =>
-        await _applicationService.ProcessCommand(command);
+        await _applicationService.ProcessRequest(command);
 
     [ProducesResponseType(typeof(UpdateItem), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [HttpGet("update-item/{id:guid}")]
     public async Task<ActionResult> GetUpdateItem([FromRoute] Guid id) =>
-        await _applicationService.ProcessQuery(new GetUpdateItem(id));
+        await _applicationService.ProcessRequest(new GetUpdateItem(id));
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     [HttpPut]
     public async Task<ActionResult> Put([FromBody] UpdateItem command) =>
-        await _applicationService.ProcessCommand(command);
+        await _applicationService.ProcessRequest(command);
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> Delete([FromRoute] Guid id) =>
-        await _applicationService.ProcessCommand(new DeleteItem(id));
+        await _applicationService.ProcessRequest(new DeleteItem(id));
 
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

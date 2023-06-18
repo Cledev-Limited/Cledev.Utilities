@@ -1,6 +1,7 @@
 using Cledev.Core;
 using Cledev.Core.Commands;
 using Cledev.Core.Queries;
+using Cledev.Core.Requests;
 using Cledev.Server.Extensions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -10,8 +11,8 @@ namespace Cledev.Server.Services;
 
 public interface IApplicationService
 {
-    Task<ActionResult> ProcessCommand<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand;
-    Task<ActionResult> ProcessQuery<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default);
+    Task<ActionResult> ProcessRequest<TRequest>(TRequest request, CancellationToken cancellationToken = default) where TRequest : IRequest;
+    Task<ActionResult> ProcessRequest<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default);
 }
 
 public class ApplicationService : IApplicationService
@@ -25,31 +26,31 @@ public class ApplicationService : IApplicationService
         _dispatcher = dispatcher;
     }
 
-    public async Task<ActionResult> ProcessCommand<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand
+    public async Task<ActionResult> ProcessRequest<TRequest>(TRequest request, CancellationToken cancellationToken = default) where TRequest : IRequest
     {
-        var validator = _serviceProvider.GetService<IValidator<TCommand>?>();
+        var validator = _serviceProvider.GetService<IValidator<TRequest>?>();
         if (validator is not null)
         {
-            var validationResult = await validator.ValidateAsync(command, cancellationToken);
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
             if (validationResult.IsValid is false)
             {
                 return validationResult.ToActionResult();
             }
         }
 
-        var commandResult = await _dispatcher.Send(command, cancellationToken);
+        var requestResult = await _dispatcher.Send(request, cancellationToken);
 
-        commandResult.UpdateActivityIfNeeded();
+        requestResult.UpdateActivityIfNeeded();
         
-        return commandResult.ToActionResult();
+        return requestResult.ToActionResult();
     }
 
-    public async Task<ActionResult> ProcessQuery<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
+    public async Task<ActionResult> ProcessRequest<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
     {
-        var queryResult = await _dispatcher.Get(query, cancellationToken);
+        var requestResult = await _dispatcher.Send(request, cancellationToken);
 
-        queryResult.UpdateActivityIfNeeded();
+        requestResult.UpdateActivityIfNeeded();
         
-        return queryResult.ToActionResult();
+        return requestResult.ToActionResult();
     }
 }
