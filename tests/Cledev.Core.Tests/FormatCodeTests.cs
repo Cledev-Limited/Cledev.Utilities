@@ -4,6 +4,7 @@ using NUnit.Framework;
 
 namespace Cledev.Core.Tests;
 
+[TestFixture]
 public class FormatCodeTests
 {
     [Test]
