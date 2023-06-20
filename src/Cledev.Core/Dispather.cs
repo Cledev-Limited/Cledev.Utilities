@@ -1,6 +1,4 @@
-﻿using Cledev.Core.Commands;
-using Cledev.Core.Events;
-using Cledev.Core.Queries;
+﻿using Cledev.Core.Notifications;
 using Cledev.Core.Requests;
 using Cledev.Core.Results;
 using Cledev.Core.Streams;
@@ -10,43 +8,29 @@ namespace Cledev.Core;
 public class Dispatcher : IDispatcher
 {
     private readonly IRequestSender _requestSender;
-    private readonly ICommandSender _commandSender;
-    private readonly IQueryProcessor _queryProcessor;
-    private readonly IEventPublisher _eventPublisher;
+    private readonly IPublisher _publisher;
     private readonly IStreamCreator _streamCreator;
 
-    public Dispatcher(IRequestSender requestSender, ICommandSender commandSender, IQueryProcessor queryProcessor, IEventPublisher eventPublisher, IStreamCreator streamCreator)
+    public Dispatcher(IRequestSender requestSender, IPublisher publisher, IStreamCreator streamCreator)
     {
         _requestSender = requestSender;
-        _commandSender = commandSender;
-        _queryProcessor = queryProcessor;
-        _eventPublisher = eventPublisher;
+        _publisher = publisher;
         _streamCreator = streamCreator;
     }
-
-    // public async Task<Result> Send<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand
-    // {
-    //     return await _commandSender.Send(command, cancellationToken);
-    // }
 
     public async Task<Result> Send<TRequest>(TRequest request, CancellationToken cancellationToken = default) where TRequest : IRequest
     {
         return await _requestSender.Send(request, cancellationToken);
     }
-    
-    // public async Task<Result<TResult>> Get<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
-    // {
-    //     return await _queryProcessor.Process(query, cancellationToken);
-    // }
 
     public async Task<Result<TResponse>> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
     {
         return await _requestSender.Send(request, cancellationToken);
     }
-    
-    public async Task<IEnumerable<Result>> Publish<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : IEvent
+
+    public async Task<IEnumerable<Result>> Publish<TNotification>(INotification notification, CancellationToken cancellationToken = default) where TNotification : INotification
     {
-        return await _eventPublisher.Publish(@event, cancellationToken);
+        return await _publisher.Publish(notification, cancellationToken);
     }
 
     public IAsyncEnumerable<TResponse> CreateStream<TResponse>(IStreamRequest<TResponse> request, CancellationToken cancellationToken = default)

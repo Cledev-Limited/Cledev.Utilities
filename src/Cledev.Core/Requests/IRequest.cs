@@ -4,6 +4,6 @@ public interface IRequest
 {
 }
 
-public interface IRequest<TResult>
+public interface IRequest<TResponse>
 {
 }
