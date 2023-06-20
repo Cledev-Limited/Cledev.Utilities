@@ -1,4 +1,4 @@
-﻿using Cledev.Core.Queries;
+﻿using Cledev.Core.Requests;
 using Cledev.Core.Results;
 using Cledev.Examples.Server.Data;
 using Cledev.Examples.Shared;
@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cledev.Examples.Server.Handlers;
 
-public class GetUpdateItemHandler : IQueryHandler<GetUpdateItem, UpdateItem>
+public class GetUpdateItemHandler : IRequestHandler<GetUpdateItem, UpdateItem>
 {
     private readonly ApplicationDbContext _dbContext;
 

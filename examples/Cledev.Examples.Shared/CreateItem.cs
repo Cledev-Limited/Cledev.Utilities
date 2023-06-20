@@ -1,13 +1,12 @@
-﻿using Cledev.Core.Commands;
-using Cledev.Core.Events;
-using Cledev.Core.Queries;
+﻿using Cledev.Core.Events;
+using Cledev.Core.Requests;
 using FluentValidation;
 
 namespace Cledev.Examples.Shared;
 
-public record GetCreateItem : QueryBase<CreateItem>;
+public record GetCreateItem : IRequest<CreateItem>;
 
-public class CreateItem : CommandBase
+public class CreateItem : IRequest
 {
     public string? Name { get; set; }
     public string? Description { get; set; }
