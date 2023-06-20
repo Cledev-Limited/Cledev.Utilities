@@ -1,4 +1,4 @@
-﻿using Cledev.Core.Events;
+﻿using Cledev.Core.Notifications;
 using Cledev.Core.Requests;
 using FluentValidation;
 
@@ -39,4 +39,4 @@ public interface IUpdateItemValidationRules
     Task<bool> IsItemNameUnique(Guid id, string name);
 }
 
-public record ItemUpdated(Guid Id, string Name, string Description) : EventBase;
+public record ItemUpdated(Guid Id, string Name, string Description) : NotificationBase;

@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using AutoMapper;
-using Cledev.Core.Events;
+using Cledev.Core.Notifications;
 using Cledev.Core.Results;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -44,7 +44,7 @@ public static class ServiceCollectionExtensions
                     .Where(t =>
                         t.GetTypeInfo().IsClass &&
                         !t.GetTypeInfo().IsAbstract &&
-                        typeof(IEvent).IsAssignableFrom(t))
+                        typeof(INotification).IsAssignableFrom(t))
                     .ToList();
 
                 foreach (var typeToMap in typesToMap)

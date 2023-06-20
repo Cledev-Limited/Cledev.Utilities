@@ -1,4 +1,4 @@
-﻿using Cledev.Core.Events;
+﻿using Cledev.Core.Notifications;
 using Cledev.Core.Results;
 using Cledev.Examples.Shared;
 using Cledev.Server.Caching;
@@ -6,9 +6,9 @@ using Cledev.Server.Caching;
 namespace Cledev.Examples.Server.Handlers;
 
 public class CacheHandlers : 
-    IEventHandler<ItemCreated>,
-    IEventHandler<ItemDeleted>,
-    IEventHandler<ItemUpdated>
+    INotificationHandler<ItemCreated>,
+    INotificationHandler<ItemDeleted>,
+    INotificationHandler<ItemUpdated>
 {
     private readonly ICacheManager _cacheManager;
 

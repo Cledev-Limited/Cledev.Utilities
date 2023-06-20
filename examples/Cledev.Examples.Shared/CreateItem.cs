@@ -1,4 +1,4 @@
-﻿using Cledev.Core.Events;
+﻿using Cledev.Core.Notifications;
 using Cledev.Core.Requests;
 using FluentValidation;
 
@@ -38,4 +38,4 @@ public interface ICreateItemValidationRules
     Task<bool> IsItemNameUnique(string name);
 }
 
-public record ItemCreated(Guid Id, string Name, string Description) : EventBase;
+public record ItemCreated(Guid Id, string Name, string Description) : NotificationBase;
