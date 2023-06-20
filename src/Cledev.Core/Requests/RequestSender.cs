@@ -26,7 +26,7 @@ public class RequestSender : IRequestSender
 
         if (handler is null)
         {
-            throw new Exception("No request handler found for request.");
+            throw new Exception("Request handler not found.");
         }
 
         return await handler.Handle(request, cancellationToken);

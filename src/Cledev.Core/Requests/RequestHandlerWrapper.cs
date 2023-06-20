@@ -11,7 +11,7 @@ internal class RequestHandlerWrapper<TRequest, TResponse> : RequestHandlerWrappe
 
         if (handler == null)
         {
-            throw new Exception("No Request handler found for Request.");
+            throw new Exception("Request handler not found.");
         }
 
         return await handler.Handle((TRequest) request, cancellationToken);

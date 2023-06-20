@@ -9,8 +9,8 @@ namespace Cledev.Server.Services;
 
 public interface IApplicationService
 {
-    Task<ActionResult> ProcessRequest<TRequest>(TRequest request, CancellationToken cancellationToken = default) where TRequest : IRequest;
-    Task<ActionResult> ProcessRequest<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default);
+    Task<ActionResult> ProcessRequest<TRequest>(TRequest request, bool validateRequest = false, CancellationToken cancellationToken = default) where TRequest : IRequest;
+    Task<ActionResult> ProcessRequest<TResponse>(IRequest<TResponse> request, bool validateRequest = false, CancellationToken cancellationToken = default);
 }
 
 public class ApplicationService : IApplicationService
@@ -24,18 +24,23 @@ public class ApplicationService : IApplicationService
         _dispatcher = dispatcher;
     }
 
-    public async Task<ActionResult> ProcessRequest<TRequest>(TRequest request, CancellationToken cancellationToken = default) where TRequest : IRequest
+    public async Task<ActionResult> ProcessRequest<TRequest>(TRequest request, bool validateRequest = false, CancellationToken cancellationToken = default) where TRequest : IRequest
     {
-        var validator = _serviceProvider.GetService<IValidator<TRequest>?>();
-        if (validator is not null)
+        if (validateRequest)
         {
+            var validator = _serviceProvider.GetService<IValidator<TRequest>?>();
+            if (validator is null)
+            {
+                throw new Exception("Request validator not found.");
+            }
+
             var validationResult = await validator.ValidateAsync(request, cancellationToken);
             if (validationResult.IsValid is false)
             {
                 return validationResult.ToActionResult();
             }
         }
-
+        
         var requestResult = await _dispatcher.Send(request, cancellationToken);
 
         requestResult.UpdateActivityIfNeeded();
@@ -43,8 +48,23 @@ public class ApplicationService : IApplicationService
         return requestResult.ToActionResult();
     }
 
-    public async Task<ActionResult> ProcessRequest<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
+    public async Task<ActionResult> ProcessRequest<TResponse>(IRequest<TResponse> request, bool validateRequest = false, CancellationToken cancellationToken = default)
     {
+        if (validateRequest)
+        {
+            var validator = _serviceProvider.GetService<IValidator<IRequest<TResponse>>?>();
+            if (validator is null)
+            {
+                throw new Exception("Request validator not found.");
+            }
+            
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+            if (validationResult.IsValid is false)
+            {
+                return validationResult.ToActionResult();
+            }          
+        }
+        
         var requestResult = await _dispatcher.Send(request, cancellationToken);
 
         requestResult.UpdateActivityIfNeeded();

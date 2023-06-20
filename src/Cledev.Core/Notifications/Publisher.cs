@@ -15,8 +15,14 @@ public class Publisher : IPublisher
     public async Task<IEnumerable<Result>> Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default) where TNotification : INotification
     {
         var handlers = _serviceProvider.GetServices<INotificationHandler<TNotification>>();
-
-        var tasks = handlers.Select(handler => handler.Handle(notification, cancellationToken)).ToList();
+        
+        var notificationHandlers = handlers as INotificationHandler<TNotification>[] ?? handlers.ToArray();
+        if (notificationHandlers.Any() is false)
+        {
+            return Enumerable.Empty<Result>();
+        }
+        
+        var tasks = notificationHandlers.Select(handler => handler.Handle(notification, cancellationToken)).ToList();
 
         return await Task.WhenAll(tasks);
     }
