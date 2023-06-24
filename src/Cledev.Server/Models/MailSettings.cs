@@ -1,4 +1,4 @@
-﻿namespace Cledev.Core.Settings;
+﻿namespace Cledev.Server.Models;
 
 public class MailSettings
 {

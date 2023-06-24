@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using AutoMapper;
-using Cledev.Core.Events;
+using Cledev.Core.Notifications;
 using Cledev.Core.Results;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,21 +30,16 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddAutoMapper(this IServiceCollection services, IEnumerable<Type> types)
     {
-        if (services == null)
-        {
-            throw new ArgumentNullException(nameof(services));
-        }
-
         var mapperConfiguration = new MapperConfiguration(configuration =>
         {
-            configuration.ShouldMapMethod = (m => false);
+            configuration.ShouldMapMethod = _ => false;
             foreach (var type in types)
             {
                 var typesToMap = type.Assembly.GetTypes()
                     .Where(t =>
                         t.GetTypeInfo().IsClass &&
                         !t.GetTypeInfo().IsAbstract &&
-                        typeof(IEvent).IsAssignableFrom(t))
+                        typeof(INotification).IsAssignableFrom(t))
                     .ToList();
 
                 foreach (var typeToMap in typesToMap)

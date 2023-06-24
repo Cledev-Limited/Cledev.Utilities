@@ -45,7 +45,7 @@ public static class StringExtensions
         return stringBuilder.ToString();
     }
 
-    public static string ToSlug(this string text, int maxLength = 50, char divider = '-', bool removeMultipleSpaces = true)
+    public static string ToSlug(this string text, char divider = '-', int maxLength = 50, bool removeMultipleSpaces = true)
     {
         if (string.IsNullOrEmpty(text))
         {

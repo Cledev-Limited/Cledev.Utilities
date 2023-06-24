@@ -1,10 +1,10 @@
-﻿using Cledev.Core.Queries;
+﻿using Cledev.Core.Requests;
 using Cledev.Core.Results;
 using Cledev.Examples.Shared;
 
 namespace Cledev.Examples.Server.Handlers;
 
-public class GetCreateItemHandler : IQueryHandler<GetCreateItem, CreateItem>
+public class GetCreateItemHandler : IRequestHandler<GetCreateItem, CreateItem>
 {
     public async Task<Result<CreateItem>> Handle(GetCreateItem query, CancellationToken cancellationToken)
     {

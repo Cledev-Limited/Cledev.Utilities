@@ -1,6 +1,5 @@
 using Cledev.Core;
-using Cledev.Core.Commands;
-using Cledev.Core.Queries;
+using Cledev.Core.Requests;
 using Cledev.Server.Extensions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -10,8 +9,8 @@ namespace Cledev.Server.Services;
 
 public interface IApplicationService
 {
-    Task<ActionResult> ProcessCommand<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand;
-    Task<ActionResult> ProcessQuery<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default);
+    Task<ActionResult> ProcessRequest<TRequest>(TRequest request, bool validateRequest = false, CancellationToken cancellationToken = default) where TRequest : IRequest;
+    Task<ActionResult> ProcessRequest<TResponse>(IRequest<TResponse> request, bool validateRequest = false, CancellationToken cancellationToken = default);
 }
 
 public class ApplicationService : IApplicationService
@@ -25,31 +24,51 @@ public class ApplicationService : IApplicationService
         _dispatcher = dispatcher;
     }
 
-    public async Task<ActionResult> ProcessCommand<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand
+    public async Task<ActionResult> ProcessRequest<TRequest>(TRequest request, bool validateRequest = false, CancellationToken cancellationToken = default) where TRequest : IRequest
     {
-        var validator = _serviceProvider.GetService<IValidator<TCommand>?>();
-        if (validator is not null)
+        if (validateRequest)
         {
-            var validationResult = await validator.ValidateAsync(command, cancellationToken);
+            var validator = _serviceProvider.GetService<IValidator<TRequest>?>();
+            if (validator is null)
+            {
+                throw new Exception("Request validator not found.");
+            }
+
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
             if (validationResult.IsValid is false)
             {
                 return validationResult.ToActionResult();
             }
         }
-
-        var commandResult = await _dispatcher.Send(command, cancellationToken);
-
-        commandResult.UpdateActivityIfNeeded();
         
-        return commandResult.ToActionResult();
+        var requestResult = await _dispatcher.Send(request, cancellationToken);
+
+        requestResult.UpdateActivityIfNeeded();
+        
+        return requestResult.ToActionResult();
     }
 
-    public async Task<ActionResult> ProcessQuery<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
+    public async Task<ActionResult> ProcessRequest<TResponse>(IRequest<TResponse> request, bool validateRequest = false, CancellationToken cancellationToken = default)
     {
-        var queryResult = await _dispatcher.Get(query, cancellationToken);
-
-        queryResult.UpdateActivityIfNeeded();
+        if (validateRequest)
+        {
+            var validator = _serviceProvider.GetService<IValidator<IRequest<TResponse>>?>();
+            if (validator is null)
+            {
+                throw new Exception("Request validator not found.");
+            }
+            
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+            if (validationResult.IsValid is false)
+            {
+                return validationResult.ToActionResult();
+            }          
+        }
         
-        return queryResult.ToActionResult();
+        var requestResult = await _dispatcher.Send(request, cancellationToken);
+
+        requestResult.UpdateActivityIfNeeded();
+        
+        return requestResult.ToActionResult();
     }
 }

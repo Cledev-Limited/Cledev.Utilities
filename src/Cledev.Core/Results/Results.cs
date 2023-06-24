@@ -39,7 +39,6 @@ public sealed class Result<TValue> : OneOfBase<Success<TValue>, Failure>
 
     public Success<TValue>? Success => IsT0 ? AsT0 : default;
     public Failure? Failure => IsT1 ? AsT1 : default;
-    
     public new TValue? Value => IsT0 ? AsT0.Result : default;
 
     public static Result<TValue> Ok(TValue result) => new(new Success<TValue>(result));

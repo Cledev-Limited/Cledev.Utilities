@@ -1,6 +1,6 @@
 using System.Net;
 using System.Net.Mail;
-using Cledev.Core.Settings;
+using Cledev.Server.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

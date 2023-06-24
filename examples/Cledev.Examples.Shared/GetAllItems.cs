@@ -1,8 +1,8 @@
-﻿using Cledev.Core.Queries;
+﻿using Cledev.Core.Requests;
 
 namespace Cledev.Examples.Shared;
 
-public record GetAllItems : QueryBase<GetAllItemsResponse>;
+public record GetAllItems : IRequest<GetAllItemsResponse>;
 
 public class GetAllItemsResponse
 {

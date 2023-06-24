@@ -1,13 +1,12 @@
-﻿using Cledev.Core.Commands;
-using Cledev.Core.Events;
-using Cledev.Core.Queries;
+﻿using Cledev.Core.Notifications;
+using Cledev.Core.Requests;
 using FluentValidation;
 
 namespace Cledev.Examples.Shared;
 
-public record GetUpdateItem(Guid Id) : QueryBase<UpdateItem>;
+public record GetUpdateItem(Guid Id) : IRequest<UpdateItem>;
 
-public class UpdateItem : CommandBase
+public class UpdateItem : IRequest
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
@@ -40,4 +39,4 @@ public interface IUpdateItemValidationRules
     Task<bool> IsItemNameUnique(Guid id, string name);
 }
 
-public record ItemUpdated(Guid Id, string Name, string Description) : EventBase;
+public record ItemUpdated(Guid Id, string Name, string Description) : NotificationBase;

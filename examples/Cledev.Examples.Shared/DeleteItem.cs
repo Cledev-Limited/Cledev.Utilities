@@ -1,9 +1,9 @@
-﻿using Cledev.Core.Commands;
-using Cledev.Core.Events;
+﻿using Cledev.Core.Notifications;
+using Cledev.Core.Requests;
 
 namespace Cledev.Examples.Shared;
 
-public class DeleteItem : CommandBase
+public class DeleteItem : IRequest
 {
     public Guid Id { get; }
 
@@ -13,4 +13,4 @@ public class DeleteItem : CommandBase
     }
 }
 
-public record ItemDeleted(Guid Id) : EventBase;
+public record ItemDeleted(Guid Id) : NotificationBase;
