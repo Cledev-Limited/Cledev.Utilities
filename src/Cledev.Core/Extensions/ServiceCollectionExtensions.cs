@@ -30,14 +30,9 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddAutoMapper(this IServiceCollection services, IEnumerable<Type> types)
     {
-        if (services == null)
-        {
-            throw new ArgumentNullException(nameof(services));
-        }
-
         var mapperConfiguration = new MapperConfiguration(configuration =>
         {
-            configuration.ShouldMapMethod = (m => false);
+            configuration.ShouldMapMethod = _ => false;
             foreach (var type in types)
             {
                 var typesToMap = type.Assembly.GetTypes()
