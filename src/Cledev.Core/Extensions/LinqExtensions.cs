@@ -33,7 +33,7 @@ public static class LinqExtensions
 
         if (!string.IsNullOrWhiteSpace(propertyName) && direction != null && source.PropertyExists(propertyName))
         {
-            source = direction == OrderByDirectionType.Asc
+            source = direction == OrderByDirection.Asc
                 ? source.OrderByProperty(propertyName)
                 : source.OrderByPropertyDescending(propertyName);
         }

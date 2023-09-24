@@ -1,6 +1,6 @@
 ﻿namespace Cledev.Core.Models.Queries;
 
-public enum OrderByDirectionType
+public enum OrderByDirection
 {
     Asc,
     Desc

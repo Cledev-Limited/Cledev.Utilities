@@ -5,7 +5,7 @@ public class QueryOptions
     private const int DefaultPageSize = 10;
     public string? Search { get; set; }
     public string? OrderByField { get; set; }
-    public OrderByDirectionType? OrderByDirection { get; set; }
+    public OrderByDirection? OrderByDirection { get; set; }
     public int CurrentPage { get; set; }
     public int PageSize { get; set; }
 
@@ -20,7 +20,7 @@ public class QueryOptions
         OrderByField = orderByField;
         PageSize = pageSize ?? DefaultPageSize;
 
-        if (!string.IsNullOrWhiteSpace(orderByDirection) && Enum.TryParse(orderByDirection, out OrderByDirectionType orderByDirectionType))
+        if (!string.IsNullOrWhiteSpace(orderByDirection) && Enum.TryParse(orderByDirection, out OrderByDirection orderByDirectionType))
         {
             OrderByDirection = orderByDirectionType;
         }
