@@ -8,16 +8,16 @@ public interface IRepository<T> where T : IAggregateRoot
 
 public class Repository<T> : IRepository<T> where T : IAggregateRoot
 {
-    private readonly IEventStore _storeProvider;
+    private readonly IDomainStore _domainStore;
 
-    public Repository(IEventStore storeProvider)
+    public Repository(IDomainStore domainStore)
     {
-        _storeProvider = storeProvider;
+        _domainStore = domainStore;
     }
 
     public async Task<T?> GetById(string id, int fromVersion = 1)
     {
-        var events = await _storeProvider.GetEvents(id, fromVersion);
+        var events = await _domainStore.GetEvents(id, fromVersion);
         var domainEvents = events as DomainEvent[] ?? events.ToArray();
         if (!domainEvents.Any())
         {
@@ -25,12 +25,12 @@ public class Repository<T> : IRepository<T> where T : IAggregateRoot
         }
 
         var aggregate = Activator.CreateInstance<T>();        
-        aggregate.LoadsFromHistory(domainEvents);
+        aggregate.Apply(domainEvents);
         return aggregate;
     }
     
     public async Task Save(T aggregate)
     {
-        await _storeProvider.AppendEvents(aggregate.Id, aggregate.UncommittedEvents);
+        await _domainStore.AppendEvents(aggregate.Id, aggregate.UncommittedEvents);
     }
 }

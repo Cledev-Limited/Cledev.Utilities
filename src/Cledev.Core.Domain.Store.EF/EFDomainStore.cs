@@ -1,12 +1,6 @@
-﻿namespace Cledev.Core.Domain;
+﻿namespace Cledev.Core.Domain.Store.EF;
 
-public interface IEventStore
-{
-    Task<IEnumerable<IDomainEvent>> GetEvents(string id, int fromVersion = 1);
-    Task AppendEvents(string id, IEnumerable<IDomainEvent> events);
-}
-
-public class DefaultEventStore : IEventStore
+public class EFDomainStore : IDomainStore
 {
     public Task<IEnumerable<IDomainEvent>> GetEvents(string id, int fromVersion = 1)
     {

@@ -5,7 +5,7 @@ public interface IAggregateRoot
     string Id { get; }
     int Version { get; }
     IEnumerable<IDomainEvent> UncommittedEvents { get; }
-    void LoadsFromHistory(IEnumerable<IDomainEvent> events);
+    void Apply(IEnumerable<IDomainEvent> events);
 }
 
 public abstract class AggregateRoot : IAggregateRoot
@@ -31,7 +31,13 @@ public abstract class AggregateRoot : IAggregateRoot
         Id = id;
     }
 
-    public void LoadsFromHistory(IEnumerable<IDomainEvent> domainEvents)
+    protected void AddEvent(IDomainEvent @event)
+    {
+        _uncommittedEvents.Add(@event);
+        Apply(@event);
+    }
+    
+    public void Apply(IEnumerable<IDomainEvent> domainEvents)
     {
         var events = domainEvents as IDomainEvent[] ?? domainEvents.ToArray();
 
@@ -39,12 +45,6 @@ public abstract class AggregateRoot : IAggregateRoot
         {
             Apply(@event);
         }
-    }
-    
-    protected void AddEvent(IDomainEvent @event)
-    {
-        _uncommittedEvents.Add(@event);
-        Apply(@event);
     }
     
     protected abstract bool Apply<T>(T @event) where T : IDomainEvent;
