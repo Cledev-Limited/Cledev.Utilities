@@ -5,8 +5,7 @@ namespace Cledev.Core.Domain.Store.EF;
 
 public class DomainDbContext : DbContext
 {
-    public DomainDbContext(DbContextOptions<DomainDbContext> options)
-        : base(options)
+    public DomainDbContext(DbContextOptions<DomainDbContext> options) : base(options)
     {
     }
 
@@ -16,7 +15,7 @@ public class DomainDbContext : DbContext
 
         builder
             .Entity<EventEntity>()
-            .ToTable(name: "DomainEvent");
+            .ToTable(name: "Events");
     }
     
     public DbSet<EventEntity> Events { get; set; } = null!;
