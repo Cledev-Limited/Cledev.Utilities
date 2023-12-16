@@ -3,7 +3,9 @@
 public interface IDomainStore
 {
     Task<IEnumerable<IDomainEvent>> GetEvents(string id, int fromVersion = 1);
-    Task AppendEvents(string id, IEnumerable<IDomainEvent> events);
+    // Task AppendEvents(string id, IEnumerable<IDomainEvent> events);
+    Task<IAggregateRoot> Get(string id);
+    Task Save(IAggregateRoot aggregateRoot);
 }
 
 public class DefaultDomainStore : IDomainStore
@@ -13,7 +15,17 @@ public class DefaultDomainStore : IDomainStore
         throw new NotImplementedException();
     }
 
-    public Task AppendEvents(string id, IEnumerable<IDomainEvent> events) 
+    // public Task AppendEvents(string id, IEnumerable<IDomainEvent> events) 
+    // {
+    //     throw new NotImplementedException();
+    // }
+
+    public Task<IAggregateRoot> Get(string id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Save(IAggregateRoot aggregateRoot)
     {
         throw new NotImplementedException();
     }

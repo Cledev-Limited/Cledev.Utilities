@@ -17,6 +17,8 @@ public class Repository<T> : IRepository<T> where T : IAggregateRoot
 
     public async Task<T?> GetById(string id, int fromVersion = 1)
     {
+        // TODO: Add options for weak and strong view
+        
         var events = await _domainStore.GetEvents(id, fromVersion);
         var domainEvents = events as DomainEvent[] ?? events.ToArray();
         if (!domainEvents.Any())
@@ -31,6 +33,6 @@ public class Repository<T> : IRepository<T> where T : IAggregateRoot
     
     public async Task Save(T aggregate)
     {
-        await _domainStore.AppendEvents(aggregate.Id, aggregate.UncommittedEvents);
+        await _domainStore.Save(aggregate);
     }
 }

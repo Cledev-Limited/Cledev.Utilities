@@ -14,9 +14,14 @@ public class DomainDbContext : DbContext
         base.OnModelCreating(builder);
 
         builder
+            .Entity<AggregateEntity>()
+            .ToTable(name: "Aggregates");
+        
+        builder
             .Entity<EventEntity>()
             .ToTable(name: "Events");
     }
     
+    public DbSet<AggregateEntity> Aggregates { get; set; } = null!;
     public DbSet<EventEntity> Events { get; set; } = null!;
 }

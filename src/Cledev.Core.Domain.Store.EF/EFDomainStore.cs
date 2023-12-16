@@ -7,7 +7,17 @@ public class EFDomainStore : IDomainStore
         throw new NotImplementedException();
     }
 
-    public Task AppendEvents(string id, IEnumerable<IDomainEvent> events) 
+    // public Task AppendEvents(string id, IEnumerable<IDomainEvent> events) 
+    // {
+    //     throw new NotImplementedException();
+    // }
+    
+    public Task<IAggregateRoot> Get(string id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Save(IAggregateRoot aggregateRoot)
     {
         throw new NotImplementedException();
     }
