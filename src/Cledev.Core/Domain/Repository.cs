@@ -17,7 +17,7 @@ public class Repository<T> : IRepository<T> where T : IAggregateRoot
 
     public async Task<T?> GetById(string id, int fromVersion = 1)
     {
-        // TODO: Add options for weak and strong view
+        // TODO: Add options for weak and strong views
         
         var events = await _domainStore.GetEvents(id, fromVersion);
         var domainEvents = events as DomainEvent[] ?? events.ToArray();

@@ -20,6 +20,7 @@
 		<PackageReference Include="AutoMapper" Version="10.1.1" />
 		<PackageReference Include="FluentValidation" Version="10.4.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="OneOf" Version="3.0.223" />
 		<PackageReference Include="Scrutor" Version="4.2.0" />
 	</ItemGroup>
