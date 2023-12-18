@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Cledev.Core.Domain.Store.EF\Cledev.Core.Domain.Store.EF.csproj" />
     <ProjectReference Include="..\..\src\Cledev.Core\Cledev.Core.csproj" />
     <ProjectReference Include="..\..\src\Cledev.Server\Cledev.Server.csproj" />
     <ProjectReference Include="..\Cledev.Examples.Client\Cledev.Examples.Client.csproj" />

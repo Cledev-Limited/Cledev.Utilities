@@ -14,7 +14,7 @@ public interface IAggregateRoot
 
 public abstract class AggregateRoot : IAggregateRoot
 {
-    public string Id { get; }
+    public string Id { get; protected set; }
     public int Version { get; private set; }
     
     [JsonIgnore]

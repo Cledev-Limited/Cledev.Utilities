@@ -12,15 +12,15 @@ public abstract class DomainDbContext : IdentityDbContext<IdentityUser>
     {
     }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(builder);
+        base.OnModelCreating(modelBuilder);
 
-        builder
+        modelBuilder
             .Entity<AggregateEntity>()
             .ToTable(name: "Aggregates");
         
-        builder
+        modelBuilder
             .Entity<EventEntity>()
             .ToTable(name: "Events");
     }
@@ -38,6 +38,11 @@ public abstract class DomainDbContext : IdentityDbContext<IdentityUser>
 
         foreach (var changedEntity in ChangeTracker.Entries())
         {
+            if (changedEntity.Entity is IAggregateRoot aggregateRoot)
+            {
+                this.AddDomainEntities(aggregateRoot);
+            }
+            
             if (changedEntity.Entity is IAuditableEntity auditableEntity)
             {
                 switch (changedEntity.State)
