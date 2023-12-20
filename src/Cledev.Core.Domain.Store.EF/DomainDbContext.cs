@@ -1,5 +1,6 @@
 ﻿using Cledev.Core.Domain.Store.EF.Entities;
 using Cledev.Core.Domain.Store.EF.Extensions;
+using Cledev.Core.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -38,11 +39,6 @@ public abstract class DomainDbContext : IdentityDbContext<IdentityUser>
 
         foreach (var changedEntity in ChangeTracker.Entries())
         {
-            if (changedEntity.Entity is IAggregateRoot aggregateRoot)
-            {
-                this.AddDomainEntities(aggregateRoot);
-            }
-            
             if (changedEntity.Entity is IAuditableEntity auditableEntity)
             {
                 switch (changedEntity.State)
@@ -69,18 +65,32 @@ public abstract class DomainDbContext : IdentityDbContext<IdentityUser>
 
 public static class DomainDbContextExtensions
 {
-    public static void AddDomainEntities(this DomainDbContext domainDbContext, IAggregateRoot aggregateRoot, int version, bool aggregateIsNew = false)
+    public static async Task<Result> SaveAggregate(this DomainDbContext domainDbContext, IAggregateRoot aggregateRoot, int expectedVersionNumber, CancellationToken cancellationToken = default)
     {
-        var aggregateEntity = aggregateRoot.ToAggregateEntity(version);
-        if(aggregateIsNew)
+        // TODO: Validate expected version number against current aggregate version
+        
+        var aggregateEntity = aggregateRoot.ToAggregateEntity(expectedVersionNumber + 1);
+        if(expectedVersionNumber > 0)
         {
-            domainDbContext.Aggregates.Add(aggregateEntity);
+            domainDbContext.Update(aggregateRoot);
+            domainDbContext.Aggregates.Update(aggregateEntity);
         }
         else
         {
-            domainDbContext.Aggregates.Update(aggregateEntity);
+            domainDbContext.Add(aggregateRoot);
+            domainDbContext.Aggregates.Add(aggregateEntity);
         }
-        // TODO: Add events
-        // domainDbContext.Events.AddRange(aggregateRoot.UncommittedEvents.Select(x => x.ToEventEntity(aggregateEntity.Id)));
+
+        var domainEvents = aggregateRoot.UncommittedEvents.ToArray();
+        for (var i = 0; i < domainEvents.Length; i++)
+        {
+            var domainEvent = domainEvents[i];
+            var eventEntity = domainEvent.ToEventEntity(expectedVersionNumber + i + 1);
+            domainDbContext.Events.Add(eventEntity);
+        }
+
+        await domainDbContext.SaveChangesAsync(cancellationToken);
+        
+        return Result.Ok();
     }
 }

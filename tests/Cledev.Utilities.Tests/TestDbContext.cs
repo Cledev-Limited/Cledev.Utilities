@@ -7,7 +7,7 @@ public sealed class TestDbContext : DomainDbContext
 {
     public TestDbContext(DbContextOptions<DomainDbContext> options) : base(options)
     {
-        Database.Migrate();
+        // Database.Migrate();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
