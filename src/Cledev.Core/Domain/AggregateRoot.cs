@@ -40,6 +40,7 @@ public abstract class AggregateRoot : IAggregateRoot
     {
         _uncommittedEvents.Add(@event);
         Apply(@event);
+        Version++;
     }
     
     public void Apply(IEnumerable<IDomainEvent> domainEvents)
@@ -49,6 +50,7 @@ public abstract class AggregateRoot : IAggregateRoot
         foreach (var @event in events)
         {
             Apply(@event);
+            Version++;
         }
     }
     

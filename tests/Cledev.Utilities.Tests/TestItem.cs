@@ -2,7 +2,6 @@
 using Cledev.Core.Domain.Store.EF;
 using Cledev.Core.Requests;
 using Cledev.Core.Results;
-using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace Cledev.Utilities.Tests;
 
@@ -11,7 +10,7 @@ public class TestItem : AggregateRoot
     public string Name { get; private set; } = null!;
     public string Description { get; private set; } = null!;
 
-    private TestItem() { }
+    public TestItem() { }
 
     public TestItem(string id, string name, string description)
     {
@@ -125,13 +124,14 @@ public class UpdateTestItemNameHandler : IRequestHandler<UpdateTestItemName>
 
     public async Task<Result> Handle(UpdateTestItemName request, CancellationToken cancellationToken = default)
     {
-        var testItem = _testDbContext.Items.FirstOrDefault(i => i.Id == request.Id);
-        if (testItem is null)
+        // var testItem = _testDbContext.Items.FirstOrDefault(i => i.Id == request.Id);
+        var testItem = await _testDbContext.GetAggregate<TestItem>(request.Id, ReadMode.Strong);
+        if (testItem.IsNotSuccess)
         {
-            return new Failure(ErrorCodes.NotFound);
+            return testItem.Failure!;
         }
-        testItem.UpdateName(request.Name);
-        var result = await _testDbContext.SaveAggregate(testItem, expectedVersionNumber: testItem.Version, cancellationToken);
+        testItem.Value!.UpdateName(request.Name);
+        var result = await _testDbContext.SaveAggregate(testItem.Value!, expectedVersionNumber: testItem.Value!.Version, cancellationToken);
         return result;
     }
 }
