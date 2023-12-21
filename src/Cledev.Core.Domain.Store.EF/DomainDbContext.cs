@@ -4,6 +4,7 @@ using Cledev.Core.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Cledev.Core.Domain.Store.EF;
 
@@ -65,6 +66,28 @@ public abstract class DomainDbContext : IdentityDbContext<IdentityUser>
 
 public static class DomainDbContextExtensions
 {
+    public static async Task<Result<T>> GetAggregate<T>(this DomainDbContext domainDbContext, string id, ReadMode readMode = ReadMode.Weak, int fromVersionNumber = 1) where T : IAggregateRoot
+    {
+        if (readMode is ReadMode.Strong)
+        {
+            var eventEntities = await domainDbContext.Events.Where(x => x.AggregateRootId == id && x.Sequence >= fromVersionNumber).ToListAsync();
+            if (eventEntities.Count == 0)
+            {
+                return new Failure(ErrorCodes.NotFound);
+            }
+            var aggregate = Activator.CreateInstance<T>();          
+            aggregate.Apply(eventEntities.Select(x => (IDomainEvent)JsonConvert.DeserializeObject(x.Data, Type.GetType(x.Type)!)!));
+            return aggregate;
+        }
+        
+        var aggregateEntity = await domainDbContext.Aggregates.FirstOrDefaultAsync(x => x.Id == id);
+        if (aggregateEntity is null)
+        {
+            return new Failure(ErrorCodes.NotFound);
+        }
+        return JsonConvert.DeserializeObject<T>(aggregateEntity.Data)!;
+    }
+    
     public static async Task<Result> SaveAggregate(this DomainDbContext domainDbContext, IAggregateRoot aggregateRoot, int expectedVersionNumber, CancellationToken cancellationToken = default)
     {
         // TODO: Validate expected version number against current aggregate version
@@ -93,4 +116,10 @@ public static class DomainDbContextExtensions
         
         return Result.Ok();
     }
+}
+
+public enum ReadMode
+{
+    Weak,
+    Strong
 }

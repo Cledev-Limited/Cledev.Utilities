@@ -2,6 +2,7 @@
 using Cledev.Core.Domain.Store.EF;
 using Cledev.Core.Requests;
 using Cledev.Core.Results;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace Cledev.Utilities.Tests;
 
@@ -68,6 +69,18 @@ public class CreateTestItem : IRequest
     public string Description { get; init; } = null!;
 }
 
+public class UpdateTestItemName : IRequest
+{
+    public string Id { get; init; } = null!;
+    public string Name { get; init; } = null!;
+}
+
+public class UpdateTestItemDescription : IRequest
+{
+    public string Id { get; init; } = null!;
+    public string Description { get; init; } = null!;
+}
+
 public class TestItemCreated : DomainEvent
 {
     public string Name { get; init; } = null!;
@@ -97,6 +110,28 @@ public class CreateTestItemHandler : IRequestHandler<CreateTestItem>
     {
         var testItem = new TestItem(request.Id, request.Name, request.Description);
         var result = await _testDbContext.SaveAggregate(testItem, expectedVersionNumber: 0, cancellationToken);
+        return result;
+    }
+}
+
+public class UpdateTestItemNameHandler : IRequestHandler<UpdateTestItemName>
+{
+    private readonly TestDbContext _testDbContext;
+
+    public UpdateTestItemNameHandler(TestDbContext testDbContext)
+    {
+        _testDbContext = testDbContext;
+    }
+
+    public async Task<Result> Handle(UpdateTestItemName request, CancellationToken cancellationToken = default)
+    {
+        var testItem = _testDbContext.Items.FirstOrDefault(i => i.Id == request.Id);
+        if (testItem is null)
+        {
+            return new Failure(ErrorCodes.NotFound);
+        }
+        testItem.UpdateName(request.Name);
+        var result = await _testDbContext.SaveAggregate(testItem, expectedVersionNumber: testItem.Version, cancellationToken);
         return result;
     }
 }

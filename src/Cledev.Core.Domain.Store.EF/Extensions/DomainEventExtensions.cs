@@ -12,7 +12,7 @@ public static class DomainEventExtensions
             Id = @event.Id,
             AggregateRootId = @event.AggregateRootId,
             // CommandId = @event.CommandId,
-            Version = version,
+            Sequence = version,
             Type = @event.GetType().AssemblyQualifiedName ?? throw new InvalidOperationException(),
             Data = JsonConvert.SerializeObject(@event),
             TimeStamp = @event.TimeStamp,

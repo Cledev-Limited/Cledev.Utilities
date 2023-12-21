@@ -4,7 +4,7 @@ public class EventEntity
 {
     public string Id { get; set; } = null!;
     public string AggregateRootId { get; set; } = null!;
-    public int Version { get; set; }
+    public int Sequence { get; set; }
     public string Type { get; set; } = null!;
     public string Data { get; set; } = null!;
     public DateTimeOffset TimeStamp { get; set; }

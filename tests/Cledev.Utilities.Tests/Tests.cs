@@ -37,7 +37,7 @@ public class Tests
         
             @event.Should().NotBeNull();
             @event!.Type.Should().Be(typeof(TestItemCreated).AssemblyQualifiedName);
-            @event.Version.Should().Be(1);
+            @event.Sequence.Should().Be(1);
         }
     }
 }
