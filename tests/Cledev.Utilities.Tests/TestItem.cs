@@ -130,8 +130,9 @@ public class UpdateTestItemNameHandler : IRequestHandler<UpdateTestItemName>
         {
             return testItem.Failure!;
         }
+        var expectedVersionNumber = testItem.Value!.Version;
         testItem.Value!.UpdateName(request.Name);
-        var result = await _testDbContext.SaveAggregate(testItem.Value!, expectedVersionNumber: testItem.Value!.Version, cancellationToken);
+        var result = await _testDbContext.SaveAggregate(testItem.Value!, expectedVersionNumber, cancellationToken);
         return result;
     }
 }
