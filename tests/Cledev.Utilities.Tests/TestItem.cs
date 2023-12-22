@@ -7,8 +7,8 @@ namespace Cledev.Utilities.Tests;
 
 public class TestItem : AggregateRoot
 {
-    public string Name { get; private set; } = null!;
-    public string Description { get; private set; } = null!;
+    public string Name { get; set; } = null!;
+    public string Description { get; set; } = null!;
 
     public TestItem() { }
 
@@ -124,7 +124,6 @@ public class UpdateTestItemNameHandler : IRequestHandler<UpdateTestItemName>
 
     public async Task<Result> Handle(UpdateTestItemName request, CancellationToken cancellationToken = default)
     {
-        // var testItem = _testDbContext.Items.FirstOrDefault(i => i.Id == request.Id);
         var testItem = await _testDbContext.GetAggregate<TestItem>(request.Id, ReadMode.Strong);
         if (testItem.IsNotSuccess)
         {

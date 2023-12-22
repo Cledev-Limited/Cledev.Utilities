@@ -14,8 +14,8 @@ public interface IAggregateRoot
 
 public abstract class AggregateRoot : IAggregateRoot
 {
-    public string Id { get; protected set; }
-    public int Version { get; private set; }
+    public string Id { get; set; }
+    public int Version { get; set; }
     
     [JsonIgnore]
     public IEnumerable<IDomainEvent> UncommittedEvents => _uncommittedEvents.AsReadOnly();

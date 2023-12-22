@@ -70,7 +70,7 @@ public static class DomainDbContextExtensions
     {
         if (readMode is ReadMode.Strong)
         {
-            var eventEntities = await domainDbContext.Events.Where(x => x.AggregateRootId == id && x.Sequence >= fromVersionNumber).ToListAsync();
+            var eventEntities = await domainDbContext.Events.AsNoTracking().Where(x => x.AggregateRootId == id && x.Sequence >= fromVersionNumber).ToListAsync();
             if (eventEntities.Count == 0)
             {
                 return new Failure(ErrorCodes.NotFound);
@@ -80,12 +80,13 @@ public static class DomainDbContextExtensions
             return aggregate;
         }
         
-        var aggregateEntity = await domainDbContext.Aggregates.FirstOrDefaultAsync(x => x.Id == id);
+        var aggregateEntity = await domainDbContext.Aggregates.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
         if (aggregateEntity is null)
         {
             return new Failure(ErrorCodes.NotFound);
         }
-        return JsonConvert.DeserializeObject<T>(aggregateEntity.Data)!;
+
+        return (T)JsonConvert.DeserializeObject(aggregateEntity.Data, Type.GetType(aggregateEntity.Type)!)!;
     }
     
     public static async Task<Result> SaveAggregate(this DomainDbContext domainDbContext, IAggregateRoot aggregateRoot, int expectedVersionNumber, CancellationToken cancellationToken = default)
