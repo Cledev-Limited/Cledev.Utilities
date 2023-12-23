@@ -93,15 +93,22 @@ public static class DomainDbContextExtensions
     {
         // TODO: Validate expected version number against current aggregate version
         
-        var aggregateEntity = aggregateRoot.ToAggregateEntity(expectedVersionNumber + 1);
         if(expectedVersionNumber > 0)
         {
             domainDbContext.Update(aggregateRoot);
-            domainDbContext.Aggregates.Update(aggregateEntity);
         }
         else
         {
             domainDbContext.Add(aggregateRoot);
+        }
+        
+        var aggregateEntity = aggregateRoot.ToAggregateEntity(expectedVersionNumber + 1);
+        if(expectedVersionNumber > 0)
+        {
+            domainDbContext.Aggregates.Update(aggregateEntity);
+        }
+        else
+        {
             domainDbContext.Aggregates.Add(aggregateEntity);
         }
 

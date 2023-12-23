@@ -32,17 +32,15 @@ public sealed class TestDbContext : DomainDbContext
 
 internal class TestItemEntityTypeConfiguration : IEntityTypeConfiguration<TestItem>
 {
-    public void Configure(EntityTypeBuilder<TestItem> orderConfiguration)
+    public void Configure(EntityTypeBuilder<TestItem> entityTypeBuilder)
     {
-        orderConfiguration.ToTable("Items");
+        entityTypeBuilder.ToTable("Items");
         // Other configuration
 
-        var navigation =
-            orderConfiguration.Metadata.FindNavigation(nameof(TestItem.SubItems));
+        var navigation = entityTypeBuilder.Metadata.FindNavigation(nameof(TestItem.SubItems));
 
-        // EF access the OrderItem collection property through its backing field
+        // EF access the SubItem collection property through its backing field
         navigation!.SetPropertyAccessMode(PropertyAccessMode.Field);
-
         // Other configuration
     }
 }

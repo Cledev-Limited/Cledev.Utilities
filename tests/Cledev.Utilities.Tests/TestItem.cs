@@ -1,7 +1,10 @@
-﻿using Cledev.Core.Domain;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Cledev.Core.Data;
+using Cledev.Core.Domain;
 using Cledev.Core.Domain.Store.EF;
 using Cledev.Core.Requests;
 using Cledev.Core.Results;
+using Microsoft.EntityFrameworkCore;
 
 namespace Cledev.Utilities.Tests;
 
@@ -84,7 +87,7 @@ public class TestItem : AggregateRoot
 public class TestSubItem
 {
     public Guid Id { get; set; }
-    public string TestItemId { get; set; } = null!;
+    public string TestItemId { get; set; } = null!; // TODO: To be removed
     public string Name { get; set; } = null!;
 }
 
@@ -196,4 +199,23 @@ public class AddTestSubItemHandler : IRequestHandler<AddTestSubItem>
         var result = await _testDbContext.SaveAggregate(testItem.Value!, expectedVersionNumber, cancellationToken);
         return result;
     }
+}
+
+public class TestItemEntity : Entity
+{
+    public string Id { get; set; } = null!;
+    public string Name { get; set; } = null!;
+    public string Description { get; set; } = null!;
+    
+    public virtual List<TestSubItemEntity> TestSubItems { get; set; } = new();
+}
+
+public class TestSubItemEntity : Entity
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = null!;
+    public string Description { get; set; } = null!;
+    
+    public string TestItemId { get; set; } = null!;
+    public virtual TestItemEntity TestItem { get; set; } = null!;
 }

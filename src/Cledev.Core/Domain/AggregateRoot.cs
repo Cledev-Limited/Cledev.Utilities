@@ -1,6 +1,4 @@
-﻿
-
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Cledev.Core.Domain;
 
@@ -14,8 +12,8 @@ public interface IAggregateRoot
 
 public abstract class AggregateRoot : IAggregateRoot
 {
-    public string Id { get; set; }
-    public int Version { get; set; }
+    public string Id { get; protected set; }
+    public int Version { get; private set; }
     
     [JsonIgnore]
     public IEnumerable<IDomainEvent> UncommittedEvents => _uncommittedEvents.AsReadOnly();
