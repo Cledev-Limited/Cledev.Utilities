@@ -86,4 +86,49 @@ public class Tests
             @event.Sequence.Should().Be(2);
         }
     }
+    
+    [Test]
+    public async Task ShouldAddSubItem()
+    {
+        var createTestItem = new CreateTestItem
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "Test Item",
+            Description = "Test Description"
+        };
+
+        await using (var dbContext1 = new TestDbContext(Shared.CreateContextOptions()))
+        {
+            var createTestItemHandler = new CreateTestItemHandler(dbContext1);
+            await createTestItemHandler.Handle(createTestItem);
+        }
+        
+        var addTestSubItem = new AddTestSubItem
+        {
+            Id = createTestItem.Id,
+            SubItemName = "Test Sub Item"
+        };
+
+        await using var dbContext2 = new TestDbContext(Shared.CreateContextOptions());
+        var addTestSubItemHandler = new AddTestSubItemHandler(dbContext2);
+        await addTestSubItemHandler.Handle(addTestSubItem);
+
+        var testSubItem = dbContext2.SubItems.FirstOrDefault(i => i.TestItemId == createTestItem.Id);
+        var aggregate = dbContext2.Aggregates.FirstOrDefault(a => a.Id == createTestItem.Id);
+        var @event = dbContext2.Events.LastOrDefault(a => a.AggregateRootId == createTestItem.Id);
+
+        using (new AssertionScope())
+        {
+            testSubItem.Should().NotBeNull();
+            testSubItem!.Name.Should().Be(addTestSubItem.SubItemName);
+            
+            aggregate.Should().NotBeNull();
+            aggregate!.Type.Should().Be(typeof(TestItem).AssemblyQualifiedName);
+            aggregate.Version.Should().Be(2);
+        
+            @event.Should().NotBeNull();
+            @event!.Type.Should().Be(typeof(TestSubItemAdded).AssemblyQualifiedName);
+            @event.Sequence.Should().Be(2);
+        }
+    }
 }

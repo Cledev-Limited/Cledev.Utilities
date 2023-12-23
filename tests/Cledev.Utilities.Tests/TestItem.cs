@@ -10,6 +10,9 @@ public class TestItem : AggregateRoot
     public string Name { get; set; } = null!;
     public string Description { get; set; } = null!;
 
+    public IEnumerable<TestSubItem> SubItems => _subItems.AsReadOnly();
+    private readonly List<TestSubItem> _subItems = new();
+    
     public TestItem() { }
 
     public TestItem(string id, string name, string description)
@@ -40,6 +43,16 @@ public class TestItem : AggregateRoot
         });
     }
     
+    public void AddSubItem(string name)
+    {
+        AddEvent(new TestSubItemAdded
+        {
+            AggregateRootId = Id,
+            SubItemId = Guid.NewGuid(),
+            SubItemName = name
+        });
+    }
+    
     protected override bool Apply<T>(T @event)
     {
         switch (@event)
@@ -55,10 +68,24 @@ public class TestItem : AggregateRoot
             case TestItemDescriptionUpdated itemDescriptionUpdated:
                 Description = itemDescriptionUpdated.Description;
                 break;
+            case TestSubItemAdded subItemAdded:
+                _subItems.Add(new TestSubItem
+                {
+                    Id = subItemAdded.SubItemId,
+                    Name = subItemAdded.SubItemName
+                });
+                break;
         }
 
         return true;
     }
+}
+
+public class TestSubItem
+{
+    public Guid Id { get; set; }
+    public string TestItemId { get; set; } = null!;
+    public string Name { get; set; } = null!;
 }
 
 public class CreateTestItem : IRequest
@@ -80,6 +107,12 @@ public class UpdateTestItemDescription : IRequest
     public string Description { get; init; } = null!;
 }
 
+public class AddTestSubItem : IRequest
+{
+    public string Id { get; init; } = null!;
+    public string SubItemName { get; init; } = null!;
+}
+
 public class TestItemCreated : DomainEvent
 {
     public string Name { get; init; } = null!;
@@ -94,6 +127,12 @@ public class TestItemNameUpdated : DomainEvent
 public class TestItemDescriptionUpdated : DomainEvent
 {
     public string Description { get; init; } = null!;
+}
+
+public class TestSubItemAdded : DomainEvent
+{
+    public Guid SubItemId { get; set; }
+    public string SubItemName { get; init; } = null!;
 }
 
 public class CreateTestItemHandler : IRequestHandler<CreateTestItem>
@@ -131,6 +170,29 @@ public class UpdateTestItemNameHandler : IRequestHandler<UpdateTestItemName>
         }
         var expectedVersionNumber = testItem.Value!.Version;
         testItem.Value!.UpdateName(request.Name);
+        var result = await _testDbContext.SaveAggregate(testItem.Value!, expectedVersionNumber, cancellationToken);
+        return result;
+    }
+}
+
+public class AddTestSubItemHandler : IRequestHandler<AddTestSubItem>
+{
+    private readonly TestDbContext _testDbContext;
+
+    public AddTestSubItemHandler(TestDbContext testDbContext)
+    {
+        _testDbContext = testDbContext;
+    }
+
+    public async Task<Result> Handle(AddTestSubItem request, CancellationToken cancellationToken = default)
+    {
+        var testItem = await _testDbContext.GetAggregate<TestItem>(request.Id, ReadMode.Strong);
+        if (testItem.IsNotSuccess)
+        {
+            return testItem.Failure!;
+        }
+        var expectedVersionNumber = testItem.Value!.Version;
+        testItem.Value!.AddSubItem(request.SubItemName);
         var result = await _testDbContext.SaveAggregate(testItem.Value!, expectedVersionNumber, cancellationToken);
         return result;
     }
