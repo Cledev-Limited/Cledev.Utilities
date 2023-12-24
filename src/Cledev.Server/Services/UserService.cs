@@ -1,4 +1,6 @@
-﻿using Cledev.Core.Extensions;
+﻿// TODO: Move to http context extensions
+
+using Cledev.Core.Extensions;
 using Microsoft.AspNetCore.Http;
 
 namespace Cledev.Server.Services;

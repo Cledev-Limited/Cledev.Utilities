@@ -21,8 +21,9 @@ public abstract class AggregateRoot : IAggregateRoot
     private readonly List<IDomainEvent> _uncommittedEvents = new();
     
     [JsonIgnore]
-    public IEnumerable<IEntity> Entities => DataEntities.AsReadOnly();
-    protected readonly List<IEntity> DataEntities = new();
+    public IEnumerable<IEntity> ReadModels => _readModels.AsReadOnly();
+    // ReSharper disable once InconsistentNaming
+    protected readonly List<IEntity> _readModels = new();
     
     protected AggregateRoot()
     {

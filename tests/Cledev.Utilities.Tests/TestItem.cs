@@ -86,7 +86,7 @@ public class TestItem : AggregateRoot
         switch (@event)
         {
             case TestItemCreated itemCreated:
-                DataEntities.Add(new TestItemEntity
+                _readModels.Add(new TestItemEntity
                 {
                     Id = itemCreated.AggregateRootId,
                     Name = itemCreated.Name,
@@ -95,7 +95,7 @@ public class TestItem : AggregateRoot
                 });
                 break;
             case TestItemNameUpdated itemNameUpdated:
-                DataEntities.Add(new TestItemEntity
+                _readModels.Add(new TestItemEntity
                 {
                     Id = itemNameUpdated.AggregateRootId,
                     Name = itemNameUpdated.Name,
@@ -104,7 +104,7 @@ public class TestItem : AggregateRoot
                 });
                 break;
             case TestItemDescriptionUpdated itemDescriptionUpdated:
-                DataEntities.Add(new TestItemEntity
+                _readModels.Add(new TestItemEntity
                 {
                     Id = itemDescriptionUpdated.AggregateRootId,
                     Name = Name,
@@ -113,7 +113,7 @@ public class TestItem : AggregateRoot
                 });                
                 break;
             case TestSubItemAdded subItemAdded:
-                DataEntities.Add(new TestSubItemEntity
+                _readModels.Add(new TestSubItemEntity
                 {
                     Id = subItemAdded.SubItemId,
                     Name = subItemAdded.SubItemName,

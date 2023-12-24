@@ -1,4 +1,5 @@
 using Cledev.Core.Domain.Store.EF;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -6,7 +7,7 @@ namespace Cledev.Utilities.Tests;
 
 public sealed class TestDbContext : DomainDbContext
 {
-    public TestDbContext(DbContextOptions<DomainDbContext> options) : base(options)
+    public TestDbContext(DbContextOptions<DomainDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options, httpContextAccessor)
     {
         // Database.Migrate();
     }

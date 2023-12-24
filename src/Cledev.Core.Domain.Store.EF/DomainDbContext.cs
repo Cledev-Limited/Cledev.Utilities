@@ -1,7 +1,9 @@
 ﻿using Cledev.Core.Data;
 using Cledev.Core.Domain.Store.EF.Entities;
 using Cledev.Core.Domain.Store.EF.Extensions;
+using Cledev.Core.Extensions;
 using Cledev.Core.Results;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -11,8 +13,11 @@ namespace Cledev.Core.Domain.Store.EF;
 
 public abstract class DomainDbContext : IdentityDbContext<IdentityUser>
 {
-    protected DomainDbContext(DbContextOptions<DomainDbContext> options) : base(options)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    protected DomainDbContext(DbContextOptions<DomainDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
     {
+        _httpContextAccessor = httpContextAccessor;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -35,9 +40,7 @@ public abstract class DomainDbContext : IdentityDbContext<IdentityUser>
     {
         // TODO: Use date provider
         var utcNow = DateTimeOffset.UtcNow;
-        
-        // TODO: Use user id from http context
-        var userId = "system";
+        var userId = _httpContextAccessor.HttpContext?.User.GetUserId();
 
         foreach (var changedEntity in ChangeTracker.Entries())
         {
@@ -98,7 +101,7 @@ public static class DomainDbContextExtensions
     {
         // TODO: Validate expected version number against current aggregate version
 
-        foreach (var entity in aggregateRoot.Entities)
+        foreach (var entity in aggregateRoot.ReadModels)
         {
             switch (entity.State)
             {
@@ -106,20 +109,13 @@ public static class DomainDbContextExtensions
                     domainDbContext.Add(entity);
                     break;
                 case State.Modified:
-                    try
-                    {
-                        domainDbContext.Update(entity);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                        throw;
-                    }
-                    
+                    domainDbContext.Update(entity);
                     break;
                 case State.Deleted:
                     domainDbContext.Remove(entity);
                     break;
+                default:
+                    return new Failure(Title: "Invalid entity state");
             }
         }
 
