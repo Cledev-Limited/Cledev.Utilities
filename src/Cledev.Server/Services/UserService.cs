@@ -1,6 +1,4 @@
-﻿// TODO: Move to http context extensions
-
-using Cledev.Core.Extensions;
+﻿using Cledev.Core.Extensions;
 using Microsoft.AspNetCore.Http;
 
 namespace Cledev.Server.Services;
@@ -9,6 +7,7 @@ public interface IUserService
 {
     string? GetCurrentIdentityUserId();
     string? GetCurrentIdentityUserEmail();
+    bool UserIsAuthenticated();
 }
 
 public class UserService : IUserService
@@ -19,18 +18,11 @@ public class UserService : IUserService
         _httpContextAccessor = httpContextAccessor;
 
     public string? GetCurrentIdentityUserId() =>
-        IsUserAuthenticated() 
-            ? _httpContextAccessor.HttpContext!.User.GetUserId() 
-            : null;
+        _httpContextAccessor.CurrentUserId();
 
-    public string? GetCurrentIdentityUserEmail() => 
-        IsUserAuthenticated() 
-            ? _httpContextAccessor.HttpContext!.User.GetEmail() 
-            : null;
+    public string? GetCurrentIdentityUserEmail() =>
+        _httpContextAccessor.CurrentUserEmail();
 
-    private bool IsUserAuthenticated()
-    {
-        var claimsPrincipal = _httpContextAccessor.HttpContext?.User;
-        return claimsPrincipal?.Identity?.IsAuthenticated is true;
-    }
+    public bool UserIsAuthenticated() => 
+        _httpContextAccessor.UserIsAuthenticated();
 }

@@ -40,7 +40,7 @@ public abstract class DomainDbContext : IdentityDbContext<IdentityUser>
     {
         // TODO: Use date provider
         var utcNow = DateTimeOffset.UtcNow;
-        var userId = _httpContextAccessor.HttpContext?.User.GetUserId();
+        var userId = _httpContextAccessor.CurrentUserId();
 
         foreach (var changedEntity in ChangeTracker.Entries())
         {
@@ -101,7 +101,7 @@ public static class DomainDbContextExtensions
     {
         // TODO: Validate expected version number against current aggregate version
 
-        var aggregateEntity = aggregateRoot.ToAggregateEntity(expectedVersionNumber + 1);
+        var aggregateEntity = aggregateRoot.ToAggregateEntity(version: expectedVersionNumber + 1);
         if(expectedVersionNumber > 0)
         {
             domainDbContext.Aggregates.Update(aggregateEntity);

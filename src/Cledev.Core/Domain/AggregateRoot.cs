@@ -1,5 +1,6 @@
 ﻿using Cledev.Core.Data;
 using Newtonsoft.Json;
+// ReSharper disable InconsistentNaming
 
 namespace Cledev.Core.Domain;
 
@@ -22,7 +23,6 @@ public abstract class AggregateRoot : IAggregateRoot
     
     [JsonIgnore]
     public IEnumerable<IEntity> ReadModels => _readModels.AsReadOnly();
-    // ReSharper disable once InconsistentNaming
     protected readonly List<IEntity> _readModels = new();
     
     protected AggregateRoot()
