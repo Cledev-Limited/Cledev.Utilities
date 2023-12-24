@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 
-namespace Cledev.Utilities.Tests;
+namespace Cledev.Core.Tests;
 
 public static class Shared
 {

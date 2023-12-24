@@ -2,7 +2,7 @@ using Cledev.Core.Domain.Store.EF;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
-namespace Cledev.Utilities.Tests;
+namespace Cledev.Core.Tests;
 
 public sealed class TestDbContext : DomainDbContext
 {

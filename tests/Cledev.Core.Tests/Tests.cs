@@ -1,13 +1,12 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Execution;
-using NUnit.Framework;
+using Xunit;
 
-namespace Cledev.Utilities.Tests;
+namespace Cledev.Core.Tests;
 
-[TestFixture]
 public class Tests
 {
-    [Test]
+    [Fact]
     public async Task ShouldCreateNewAggregateAndEvents()
     {
         var createTestItem = new CreateTestItem
@@ -41,7 +40,7 @@ public class Tests
         }
     }
     
-    [Test]
+    [Fact]
     public async Task ShouldUpdateAggregateAndAddNewEvents()
     {
         var createTestItem = new CreateTestItem
@@ -87,7 +86,7 @@ public class Tests
         }
     }
     
-    [Test]
+    [Fact]
     public async Task ShouldAddSubItem()
     {
         var createTestItem = new CreateTestItem

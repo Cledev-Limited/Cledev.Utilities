@@ -4,7 +4,7 @@ using Cledev.Core.Domain.Store.EF;
 using Cledev.Core.Requests;
 using Cledev.Core.Results;
 
-namespace Cledev.Utilities.Tests;
+namespace Cledev.Core.Tests;
 
 public class TestItem : AggregateRoot
 {
