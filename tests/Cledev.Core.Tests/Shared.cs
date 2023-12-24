@@ -1,7 +1,7 @@
 ﻿using Cledev.Core.Domain.Store.EF;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Moq;
+using NSubstitute;
 
 namespace Cledev.Core.Tests;
 
@@ -16,9 +16,9 @@ public static class Shared
 
     public static IHttpContextAccessor CreateHttpContextAccessor()
     {
-        var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+        var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         var context = new DefaultHttpContext();
-        mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
-        return mockHttpContextAccessor.Object;
+        httpContextAccessor.HttpContext.Returns(context);
+        return httpContextAccessor;
     }
 }
