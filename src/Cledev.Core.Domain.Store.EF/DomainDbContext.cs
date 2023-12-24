@@ -101,24 +101,6 @@ public static class DomainDbContextExtensions
     {
         // TODO: Validate expected version number against current aggregate version
 
-        foreach (var entity in aggregateRoot.ReadModels)
-        {
-            switch (entity.State)
-            {
-                case State.Added:
-                    domainDbContext.Add(entity);
-                    break;
-                case State.Modified:
-                    domainDbContext.Update(entity);
-                    break;
-                case State.Deleted:
-                    domainDbContext.Remove(entity);
-                    break;
-                default:
-                    return new Failure(Title: "Invalid entity state");
-            }
-        }
-
         var aggregateEntity = aggregateRoot.ToAggregateEntity(expectedVersionNumber + 1);
         if(expectedVersionNumber > 0)
         {
@@ -137,6 +119,24 @@ public static class DomainDbContextExtensions
             domainDbContext.Events.Add(eventEntity);
         }
 
+        foreach (var entity in aggregateRoot.ReadModels)
+        {
+            switch (entity.State)
+            {
+                case State.Added:
+                    domainDbContext.Add(entity);
+                    break;
+                case State.Modified:
+                    domainDbContext.Update(entity);
+                    break;
+                case State.Deleted:
+                    domainDbContext.Remove(entity);
+                    break;
+                default:
+                    return new Failure(Title: "Invalid entity state");
+            }
+        }
+        
         await domainDbContext.SaveChangesAsync(cancellationToken);
         
         return Result.Ok();

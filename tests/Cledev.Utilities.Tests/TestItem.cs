@@ -81,7 +81,7 @@ public class TestItem : AggregateRoot
         return true;
     }
 
-    protected override bool AddDataEntities<T>(T @event)
+    protected override bool AddReadModels<T>(T @event)
     {
         switch (@event)
         {

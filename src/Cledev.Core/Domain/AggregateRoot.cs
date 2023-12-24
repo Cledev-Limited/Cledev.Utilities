@@ -44,7 +44,7 @@ public abstract class AggregateRoot : IAggregateRoot
     {
         _uncommittedEvents.Add(@event);
         Apply(@event);
-        AddDataEntities(@event);
+        AddReadModels(@event);
         Version++;
     }
     
@@ -60,5 +60,5 @@ public abstract class AggregateRoot : IAggregateRoot
     }
     
     protected abstract bool Apply<T>(T @event) where T : IDomainEvent;
-    protected abstract bool AddDataEntities<T>(T @event) where T : IDomainEvent;
+    protected abstract bool AddReadModels<T>(T @event) where T : IDomainEvent;
 }
