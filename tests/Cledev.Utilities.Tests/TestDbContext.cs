@@ -15,19 +15,21 @@ public sealed class TestDbContext : DomainDbContext
     {
         base.OnModelCreating(modelBuilder);
         
-        modelBuilder.ApplyConfiguration(new TestItemEntityTypeConfiguration());
+        // modelBuilder.ApplyConfiguration(new TestItemEntityTypeConfiguration());
         
-        // modelBuilder
-        //     .Entity<TestItem>()
-        //     .ToTable(name: "Items");
-        //
-        // modelBuilder
-        //     .Entity<TestSubItem>()
-        //     .ToTable(name: "SubItems");
+        modelBuilder
+            .Entity<TestItemEntity>()
+            .ToTable(name: "Items")
+            .HasMany(x => x.TestSubItems)
+            .WithOne(x => x.TestItem);
+        
+        modelBuilder
+            .Entity<TestSubItemEntity>()
+            .ToTable(name: "SubItems");
     }
 
-    public DbSet<TestItem> Items { get; set; } = null!;
-    public DbSet<TestSubItem> SubItems { get; set; } = null!;
+    public DbSet<TestItemEntity> Items { get; set; } = null!;
+    public DbSet<TestSubItemEntity> SubItems { get; set; } = null!;
 }
 
 internal class TestItemEntityTypeConfiguration : IEntityTypeConfiguration<TestItem>

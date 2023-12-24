@@ -27,7 +27,7 @@ public class Repository<T> : IRepository<T> where T : IAggregateRoot
         }
 
         var aggregate = Activator.CreateInstance<T>();        
-        aggregate.Apply(domainEvents);
+        aggregate.LoadFromHistory(domainEvents);
         return aggregate;
     }
     

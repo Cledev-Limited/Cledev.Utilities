@@ -1,4 +1,5 @@
-﻿using Cledev.Core.Domain.Store.EF.Entities;
+﻿using Cledev.Core.Data;
+using Cledev.Core.Domain.Store.EF.Entities;
 using Cledev.Core.Domain.Store.EF.Extensions;
 using Cledev.Core.Results;
 using Microsoft.AspNetCore.Identity;
@@ -66,42 +67,62 @@ public abstract class DomainDbContext : IdentityDbContext<IdentityUser>
 
 public static class DomainDbContextExtensions
 {
-    public static async Task<Result<T>> GetAggregate<T>(this DomainDbContext domainDbContext, string id, ReadMode readMode = ReadMode.Weak, int fromVersionNumber = 1) where T : IAggregateRoot
+    public static async Task<Result<T>> GetAggregate<T>(this DomainDbContext domainDbContext, string id, ReadMode readMode = ReadMode.Weak) where T : IAggregateRoot =>
+        readMode is ReadMode.Strong
+            ? await domainDbContext.GetAggregateStrongView<T>(id)
+            : await domainDbContext.GetAggregateWeakView<T>(id);
+
+    private static async Task<Result<T>> GetAggregateStrongView<T>(this DomainDbContext domainDbContext, string id) where T : IAggregateRoot
     {
-        if (readMode is ReadMode.Strong)
+        var eventEntities = await domainDbContext.Events.AsNoTracking().Where(x => x.AggregateRootId == id).ToListAsync();
+        if (eventEntities.Count == 0)
         {
-            var eventEntities = await domainDbContext.Events.AsNoTracking().Where(x => x.AggregateRootId == id && x.Sequence >= fromVersionNumber).ToListAsync();
-            if (eventEntities.Count == 0)
-            {
-                return new Failure(ErrorCodes.NotFound);
-            }
-            var aggregate = Activator.CreateInstance<T>();          
-            aggregate.Apply(eventEntities.Select(x => (IDomainEvent)JsonConvert.DeserializeObject(x.Data, Type.GetType(x.Type)!)!));
-            return aggregate;
+            return new Failure(ErrorCodes.NotFound);
         }
-        
+        var aggregate = Activator.CreateInstance<T>();          
+        aggregate.LoadFromHistory(eventEntities.Select(x => (IDomainEvent)JsonConvert.DeserializeObject(x.Data, Type.GetType(x.Type)!)!));
+        return aggregate;
+    }
+
+    private static async Task<Result<T>> GetAggregateWeakView<T>(this DomainDbContext domainDbContext, string id) where T : IAggregateRoot
+    {
         var aggregateEntity = await domainDbContext.Aggregates.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
         if (aggregateEntity is null)
         {
             return new Failure(ErrorCodes.NotFound);
         }
-
         return (T)JsonConvert.DeserializeObject(aggregateEntity.Data, Type.GetType(aggregateEntity.Type)!)!;
     }
     
-    public static async Task<Result> SaveAggregate(this DomainDbContext domainDbContext, IAggregateRoot aggregateRoot, int expectedVersionNumber, CancellationToken cancellationToken = default)
+    public static async Task<Result> SaveAggregate(this DomainDbContext domainDbContext, AggregateRoot aggregateRoot, int expectedVersionNumber, CancellationToken cancellationToken = default)
     {
         // TODO: Validate expected version number against current aggregate version
-        
-        if(expectedVersionNumber > 0)
+
+        foreach (var entity in aggregateRoot.Entities)
         {
-            domainDbContext.Update(aggregateRoot);
+            switch (entity.State)
+            {
+                case State.Added:
+                    domainDbContext.Add(entity);
+                    break;
+                case State.Modified:
+                    try
+                    {
+                        domainDbContext.Update(entity);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        throw;
+                    }
+                    
+                    break;
+                case State.Deleted:
+                    domainDbContext.Remove(entity);
+                    break;
+            }
         }
-        else
-        {
-            domainDbContext.Add(aggregateRoot);
-        }
-        
+
         var aggregateEntity = aggregateRoot.ToAggregateEntity(expectedVersionNumber + 1);
         if(expectedVersionNumber > 0)
         {

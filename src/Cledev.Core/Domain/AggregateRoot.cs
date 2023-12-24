@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Cledev.Core.Data;
+using Newtonsoft.Json;
 
 namespace Cledev.Core.Domain;
 
@@ -7,7 +8,7 @@ public interface IAggregateRoot
     string Id { get; }
     int Version { get; }
     IEnumerable<IDomainEvent> UncommittedEvents { get; }
-    void Apply(IEnumerable<IDomainEvent> events);
+    void LoadFromHistory(IEnumerable<IDomainEvent> events);
 }
 
 public abstract class AggregateRoot : IAggregateRoot
@@ -18,6 +19,10 @@ public abstract class AggregateRoot : IAggregateRoot
     [JsonIgnore]
     public IEnumerable<IDomainEvent> UncommittedEvents => _uncommittedEvents.AsReadOnly();
     private readonly List<IDomainEvent> _uncommittedEvents = new();
+    
+    [JsonIgnore]
+    public IEnumerable<IEntity> Entities => DataEntities.AsReadOnly();
+    protected readonly List<IEntity> DataEntities = new();
     
     protected AggregateRoot()
     {
@@ -38,10 +43,11 @@ public abstract class AggregateRoot : IAggregateRoot
     {
         _uncommittedEvents.Add(@event);
         Apply(@event);
+        AddDataEntities(@event);
         Version++;
     }
     
-    public void Apply(IEnumerable<IDomainEvent> domainEvents)
+    public void LoadFromHistory(IEnumerable<IDomainEvent> domainEvents)
     {
         var events = domainEvents as IDomainEvent[] ?? domainEvents.ToArray();
 
@@ -53,4 +59,5 @@ public abstract class AggregateRoot : IAggregateRoot
     }
     
     protected abstract bool Apply<T>(T @event) where T : IDomainEvent;
+    protected abstract bool AddDataEntities<T>(T @event) where T : IDomainEvent;
 }

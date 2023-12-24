@@ -1,10 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using Cledev.Core.Data;
+﻿using Cledev.Core.Data;
 using Cledev.Core.Domain;
 using Cledev.Core.Domain.Store.EF;
 using Cledev.Core.Requests;
 using Cledev.Core.Results;
-using Microsoft.EntityFrameworkCore;
 
 namespace Cledev.Utilities.Tests;
 
@@ -82,12 +80,56 @@ public class TestItem : AggregateRoot
 
         return true;
     }
+
+    protected override bool AddDataEntities<T>(T @event)
+    {
+        switch (@event)
+        {
+            case TestItemCreated itemCreated:
+                DataEntities.Add(new TestItemEntity
+                {
+                    Id = itemCreated.AggregateRootId,
+                    Name = itemCreated.Name,
+                    Description = itemCreated.Description,
+                    State = State.Added
+                });
+                break;
+            case TestItemNameUpdated itemNameUpdated:
+                DataEntities.Add(new TestItemEntity
+                {
+                    Id = itemNameUpdated.AggregateRootId,
+                    Name = itemNameUpdated.Name,
+                    Description = Description,
+                    State = State.Modified
+                });
+                break;
+            case TestItemDescriptionUpdated itemDescriptionUpdated:
+                DataEntities.Add(new TestItemEntity
+                {
+                    Id = itemDescriptionUpdated.AggregateRootId,
+                    Name = Name,
+                    Description = itemDescriptionUpdated.Description,
+                    State = State.Modified
+                });                
+                break;
+            case TestSubItemAdded subItemAdded:
+                DataEntities.Add(new TestSubItemEntity
+                {
+                    Id = subItemAdded.SubItemId,
+                    Name = subItemAdded.SubItemName,
+                    TestItemId = subItemAdded.AggregateRootId,
+                    State = State.Added
+                });
+                break;
+        }
+
+        return true;
+    }
 }
 
 public class TestSubItem
 {
     public Guid Id { get; set; }
-    public string TestItemId { get; set; } = null!; // TODO: To be removed
     public string Name { get; set; } = null!;
 }
 
@@ -214,8 +256,7 @@ public class TestSubItemEntity : Entity
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
-    public string Description { get; set; } = null!;
-    
+
     public string TestItemId { get; set; } = null!;
     public virtual TestItemEntity TestItem { get; set; } = null!;
 }
