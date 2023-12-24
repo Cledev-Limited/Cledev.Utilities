@@ -99,10 +99,15 @@ public static class DomainDbContextExtensions
     
     public static async Task<Result> SaveAggregate(this DomainDbContext domainDbContext, AggregateRoot aggregateRoot, int expectedVersionNumber, CancellationToken cancellationToken = default)
     {
-        // TODO: Validate expected version number against current aggregate version
-
-        var aggregateEntity = aggregateRoot.ToAggregateEntity(version: expectedVersionNumber + 1);
-        if(expectedVersionNumber > 0)
+        var currentVersionNumber = await domainDbContext.Events.CountAsync(x => x.AggregateRootId == aggregateRoot.Id, cancellationToken);
+        if (currentVersionNumber != expectedVersionNumber)
+        {
+            return new Failure(Title: "Concurrency exception");
+        }
+        var startingVersionNumber = expectedVersionNumber + 1;
+        
+        var aggregateEntity = aggregateRoot.ToAggregateEntity(version: startingVersionNumber);
+        if(startingVersionNumber > 1)
         {
             domainDbContext.Aggregates.Update(aggregateEntity);
         }
@@ -115,7 +120,7 @@ public static class DomainDbContextExtensions
         for (var i = 0; i < domainEvents.Length; i++)
         {
             var domainEvent = domainEvents[i];
-            var eventEntity = domainEvent.ToEventEntity(expectedVersionNumber + i + 1);
+            var eventEntity = domainEvent.ToEventEntity(version: startingVersionNumber + i);
             domainDbContext.Events.Add(eventEntity);
         }
 
