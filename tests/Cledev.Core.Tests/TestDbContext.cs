@@ -6,7 +6,7 @@ namespace Cledev.Core.Tests;
 
 public sealed class TestDbContext : DomainDbContext
 {
-    public TestDbContext(DbContextOptions<DomainDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options, httpContextAccessor)
+    public TestDbContext(DbContextOptions<DomainDbContext> options, TimeProvider timeProvider, IHttpContextAccessor httpContextAccessor) : base(options, timeProvider, httpContextAccessor)
     {
         // Database.Migrate();
     }

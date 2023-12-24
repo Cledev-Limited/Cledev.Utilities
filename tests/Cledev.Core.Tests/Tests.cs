@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Time.Testing;
 using Xunit;
 
 namespace Cledev.Core.Tests;
@@ -16,7 +17,7 @@ public class Tests
             Description = "Test Description"
         };
         
-        await using var dbContext = new TestDbContext(Shared.CreateContextOptions(), Shared.CreateHttpContextAccessor());
+        await using var dbContext = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor());
         var handler = new CreateTestItemHandler(dbContext);
         await handler.Handle(createTestItem);
 
@@ -50,7 +51,7 @@ public class Tests
             Description = "Test Description"
         };
 
-        await using (var dbContext1 = new TestDbContext(Shared.CreateContextOptions(), Shared.CreateHttpContextAccessor()))
+        await using (var dbContext1 = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor()))
         {
             var createTestItemHandler = new CreateTestItemHandler(dbContext1);
             await createTestItemHandler.Handle(createTestItem);
@@ -62,7 +63,7 @@ public class Tests
             Name = "Updated Test Item"
         };
 
-        await using var dbContext2 = new TestDbContext(Shared.CreateContextOptions(), Shared.CreateHttpContextAccessor());
+        await using var dbContext2 = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor());
         var updateTestItemHandler = new UpdateTestItemNameHandler(dbContext2);
         await updateTestItemHandler.Handle(updateTestItemName);
 
@@ -96,7 +97,7 @@ public class Tests
             Description = "Test Description"
         };
 
-        await using (var dbContext1 = new TestDbContext(Shared.CreateContextOptions(), Shared.CreateHttpContextAccessor()))
+        await using (var dbContext1 = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor()))
         {
             var createTestItemHandler = new CreateTestItemHandler(dbContext1);
             await createTestItemHandler.Handle(createTestItem);
@@ -108,7 +109,7 @@ public class Tests
             SubItemName = "Test Sub Item"
         };
 
-        await using var dbContext2 = new TestDbContext(Shared.CreateContextOptions(), Shared.CreateHttpContextAccessor());
+        await using var dbContext2 = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor());
         var addTestSubItemHandler = new AddTestSubItemHandler(dbContext2);
         await addTestSubItemHandler.Handle(addTestSubItem);
 

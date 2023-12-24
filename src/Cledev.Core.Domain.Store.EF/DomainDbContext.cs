@@ -13,10 +13,12 @@ namespace Cledev.Core.Domain.Store.EF;
 
 public abstract class DomainDbContext : IdentityDbContext<IdentityUser>
 {
+    private readonly TimeProvider _timeProvider;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    protected DomainDbContext(DbContextOptions<DomainDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
+    protected DomainDbContext(DbContextOptions<DomainDbContext> options, TimeProvider timeProvider, IHttpContextAccessor httpContextAccessor) : base(options)
     {
+        _timeProvider = timeProvider;
         _httpContextAccessor = httpContextAccessor;
     }
 
@@ -38,8 +40,7 @@ public abstract class DomainDbContext : IdentityDbContext<IdentityUser>
     
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        // TODO: Use date provider
-        var utcNow = DateTimeOffset.UtcNow;
+        var utcNow = _timeProvider.GetUtcNow();
         var userId = _httpContextAccessor.CurrentUserId();
 
         foreach (var changedEntity in ChangeTracker.Entries())
