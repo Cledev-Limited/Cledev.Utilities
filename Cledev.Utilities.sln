@@ -36,6 +36,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cledev.Core.Tests", "tests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cledev.Examples.Console", "examples\Cledev.Examples.Console\Cledev.Examples.Console.csproj", "{FBB0C44F-BFCF-46D8-9BC7-F351D77482B0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cledev.Core.Domain.Store.EF", "src\Cledev.Core.Domain.Store.EF\Cledev.Core.Domain.Store.EF.csproj", "{46BA0D47-57A1-4034-A056-9B6C9CC007DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,10 @@ Global
 		{FBB0C44F-BFCF-46D8-9BC7-F351D77482B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBB0C44F-BFCF-46D8-9BC7-F351D77482B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBB0C44F-BFCF-46D8-9BC7-F351D77482B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46BA0D47-57A1-4034-A056-9B6C9CC007DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46BA0D47-57A1-4034-A056-9B6C9CC007DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46BA0D47-57A1-4034-A056-9B6C9CC007DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46BA0D47-57A1-4034-A056-9B6C9CC007DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -87,6 +93,7 @@ Global
 		{2596C574-129F-43EA-BB24-944C7E49A7D5} = {BA2F957E-0967-4F6E-AFD9-9D03B0C5B621}
 		{DC8CEDBA-A3F7-4B62-8699-D76263EC3039} = {77793EA5-204F-460C-A1D4-1F0D671A7FED}
 		{FBB0C44F-BFCF-46D8-9BC7-F351D77482B0} = {BA2F957E-0967-4F6E-AFD9-9D03B0C5B621}
+		{46BA0D47-57A1-4034-A056-9B6C9CC007DF} = {7C21F015-E13B-48B2-9B83-987D7E993847}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F713E156-D166-4FB2-BD40-611A6F55AAB2}

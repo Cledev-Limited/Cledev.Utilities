@@ -6,29 +6,20 @@ public class MemoryCacheManager : ICacheManager
 {
     private readonly IMemoryCache _memoryCache;
 
-    public MemoryCacheManager(IMemoryCache memoryCache)
-    {
-        _memoryCache = memoryCache;
-    }
+    public MemoryCacheManager(IMemoryCache memoryCache) => _memoryCache = memoryCache;
 
-    public Task<T?> GetOrSetAsync<T>(string key, Func<Task<T?>> acquireAsync)
+    public async Task<T?> GetOrSetAsync<T>(string cacheKey, TimeSpan cacheTime, Func<Task<T>> acquireAsync)
     {
-        return GetOrSetAsync(key, 60, acquireAsync);
-    }
-
-    public async Task<T?> GetOrSetAsync<T>(string key, int cacheTime, Func<Task<T>> acquireAsync)
-    {
-        if (_memoryCache.TryGetValue(key, out T? data))
+        if (_memoryCache.TryGetValue(cacheKey, out T? data))
         {
             return data;
         }
 
         data = await acquireAsync();
 
-        var memoryCacheEntryOptions = new MemoryCacheEntryOptions()
-            .SetAbsoluteExpiration(TimeSpan.FromSeconds(cacheTime));
+        var memoryCacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(cacheTime);
 
-        _memoryCache.Set(key, data, memoryCacheEntryOptions);
+        _memoryCache.Set(cacheKey, data, memoryCacheEntryOptions);
 
         return data;
     }

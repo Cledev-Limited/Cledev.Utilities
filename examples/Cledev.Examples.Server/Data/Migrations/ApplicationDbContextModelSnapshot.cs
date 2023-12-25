@@ -164,7 +164,7 @@ namespace Cledev.Example.Server.Data.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Version")
+                    b.Property<int>("Sequence")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

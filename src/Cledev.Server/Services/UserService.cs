@@ -7,6 +7,7 @@ public interface IUserService
 {
     string? GetCurrentIdentityUserId();
     string? GetCurrentIdentityUserEmail();
+    bool UserIsAuthenticated();
 }
 
 public class UserService : IUserService
@@ -17,18 +18,11 @@ public class UserService : IUserService
         _httpContextAccessor = httpContextAccessor;
 
     public string? GetCurrentIdentityUserId() =>
-        IsUserAuthenticated() 
-            ? _httpContextAccessor.HttpContext!.User.GetUserId() 
-            : null;
+        _httpContextAccessor.GetCurrentUserId();
 
-    public string? GetCurrentIdentityUserEmail() => 
-        IsUserAuthenticated() 
-            ? _httpContextAccessor.HttpContext!.User.GetEmail() 
-            : null;
+    public string? GetCurrentIdentityUserEmail() =>
+        _httpContextAccessor.GetCurrentUserEmail();
 
-    private bool IsUserAuthenticated()
-    {
-        var claimsPrincipal = _httpContextAccessor.HttpContext?.User;
-        return claimsPrincipal?.Identity?.IsAuthenticated is true;
-    }
+    public bool UserIsAuthenticated() => 
+        _httpContextAccessor.UserIsAuthenticated();
 }

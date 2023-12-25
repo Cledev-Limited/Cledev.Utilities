@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <Authors>Luca Briguglia</Authors>
+        <Company>Cledev Limited</Company>
+        <Description>Entity Framework Store.</Description>
+        <Copyright>Luca Briguglia</Copyright>
+        <PackageProjectUrl>https://github.com/lucabriguglia/Cledev</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/lucabriguglia/Cledev</RepositoryUrl>
+        <PackageTags>.net;.net core;utilities;extensions;mediator;cqrs;event sourcing</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Version>3.0.0</Version>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Cledev.Core\Cledev.Core.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -20,7 +20,7 @@ public class GetAllItemsHandler : IRequestHandler<GetAllItems, GetAllItemsRespon
 
     public async Task<Result<GetAllItemsResponse>> Handle(GetAllItems query, CancellationToken cancellationToken)
     {
-        async Task<GetAllItemsResponse?> AcquireAsync()
+        async Task<GetAllItemsResponse?> GetAllItemsAsync()
         {
             var items = await _dbContext.Items.ToListAsync(cancellationToken);
 
@@ -30,6 +30,6 @@ public class GetAllItemsHandler : IRequestHandler<GetAllItems, GetAllItemsRespon
             };
         }
 
-        return (await _cacheManager.GetOrSetAsync("Items", AcquireAsync))!;
+        return (await _cacheManager.GetOrSetAsync(cacheKey: "Items", cacheTime: TimeSpan.FromSeconds(60), acquireAsync: GetAllItemsAsync))!;
     }
 }
