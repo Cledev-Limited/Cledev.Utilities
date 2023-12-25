@@ -4,6 +4,16 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <Authors>Luca Briguglia</Authors>
+        <Company>Cledev Limited</Company>
+        <Description>Entity Framework Store.</Description>
+        <Copyright>Luca Briguglia</Copyright>
+        <PackageProjectUrl>https://github.com/lucabriguglia/Cledev</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/lucabriguglia/Cledev</RepositoryUrl>
+        <PackageTags>.net;.net core;utilities;extensions;mediator;cqrs;event sourcing</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Version>3.0.0</Version>
     </PropertyGroup>
 
     <ItemGroup>

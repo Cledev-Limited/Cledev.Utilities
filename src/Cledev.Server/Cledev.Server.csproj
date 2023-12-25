@@ -11,9 +11,9 @@
         <Copyright>Luca Briguglia</Copyright>
         <PackageProjectUrl>https://github.com/lucabriguglia/Cledev</PackageProjectUrl>
         <RepositoryUrl>https://github.com/lucabriguglia/Cledev</RepositoryUrl>
-        <PackageTags>.net;.net core;utilities;extensions;mediator;cqrs</PackageTags>
+        <PackageTags>.net;.net core;utilities;extensions;mediator;cqrs;event sourcing</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <Version>2.1.0</Version>
+        <Version>3.0.0</Version>
     </PropertyGroup>
 
     <ItemGroup>

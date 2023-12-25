@@ -38,8 +38,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cledev.Examples.Console", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cledev.Core.Domain.Store.EF", "src\Cledev.Core.Domain.Store.EF\Cledev.Core.Domain.Store.EF.csproj", "{46BA0D47-57A1-4034-A056-9B6C9CC007DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cledev.Core.Domain.EF.SqlServer", "src\Cledev.Core.Domain.EF.SqlServer\Cledev.Core.Domain.EF.SqlServer.csproj", "{DD7EAC8A-D378-4B9C-A008-22509C7A529C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -82,10 +80,6 @@ Global
 		{46BA0D47-57A1-4034-A056-9B6C9CC007DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46BA0D47-57A1-4034-A056-9B6C9CC007DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46BA0D47-57A1-4034-A056-9B6C9CC007DF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DD7EAC8A-D378-4B9C-A008-22509C7A529C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DD7EAC8A-D378-4B9C-A008-22509C7A529C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DD7EAC8A-D378-4B9C-A008-22509C7A529C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DD7EAC8A-D378-4B9C-A008-22509C7A529C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,7 +94,6 @@ Global
 		{DC8CEDBA-A3F7-4B62-8699-D76263EC3039} = {77793EA5-204F-460C-A1D4-1F0D671A7FED}
 		{FBB0C44F-BFCF-46D8-9BC7-F351D77482B0} = {BA2F957E-0967-4F6E-AFD9-9D03B0C5B621}
 		{46BA0D47-57A1-4034-A056-9B6C9CC007DF} = {7C21F015-E13B-48B2-9B83-987D7E993847}
-		{DD7EAC8A-D378-4B9C-A008-22509C7A529C} = {7C21F015-E13B-48B2-9B83-987D7E993847}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F713E156-D166-4FB2-BD40-611A6F55AAB2}
