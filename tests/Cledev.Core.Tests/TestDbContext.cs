@@ -8,7 +8,6 @@ public sealed class TestDbContext : DomainDbContext
 {
     public TestDbContext(DbContextOptions<DomainDbContext> options, TimeProvider timeProvider, IHttpContextAccessor httpContextAccessor) : base(options, timeProvider, httpContextAccessor)
     {
-        // Database.Migrate();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

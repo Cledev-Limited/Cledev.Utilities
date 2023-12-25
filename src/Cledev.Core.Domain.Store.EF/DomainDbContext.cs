@@ -41,7 +41,7 @@ public abstract class DomainDbContext : IdentityDbContext<IdentityUser>
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var utcNow = _timeProvider.GetUtcNow();
-        var userId = _httpContextAccessor.CurrentUserId();
+        var userId = _httpContextAccessor.GetCurrentUserId();
 
         foreach (var changedEntity in ChangeTracker.Entries())
         {

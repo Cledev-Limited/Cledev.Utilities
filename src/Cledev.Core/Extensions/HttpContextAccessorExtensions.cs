@@ -4,12 +4,12 @@ namespace Cledev.Core.Extensions;
 
 public static class HttpContextAccessorExtensions
 {
-    public static string? CurrentUserId(this IHttpContextAccessor httpContextAccessor) =>
+    public static string? GetCurrentUserId(this IHttpContextAccessor httpContextAccessor) =>
         httpContextAccessor.UserIsAuthenticated() 
             ? httpContextAccessor.HttpContext?.User.GetUserId() 
             : null;
 
-    public static string? CurrentUserEmail(this IHttpContextAccessor httpContextAccessor) =>
+    public static string? GetCurrentUserEmail(this IHttpContextAccessor httpContextAccessor) =>
         httpContextAccessor.UserIsAuthenticated() 
             ? httpContextAccessor.HttpContext?.User.GetEmail() 
             : null;

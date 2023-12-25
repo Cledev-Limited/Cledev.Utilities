@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Cledev.Core.Tests;
 
-public class Tests
+public class DomainTests
 {
     [Fact]
     public async Task ShouldCreateNewAggregateAndEvents()

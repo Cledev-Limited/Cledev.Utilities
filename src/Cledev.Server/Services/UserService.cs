@@ -18,10 +18,10 @@ public class UserService : IUserService
         _httpContextAccessor = httpContextAccessor;
 
     public string? GetCurrentIdentityUserId() =>
-        _httpContextAccessor.CurrentUserId();
+        _httpContextAccessor.GetCurrentUserId();
 
     public string? GetCurrentIdentityUserEmail() =>
-        _httpContextAccessor.CurrentUserEmail();
+        _httpContextAccessor.GetCurrentUserEmail();
 
     public bool UserIsAuthenticated() => 
         _httpContextAccessor.UserIsAuthenticated();
