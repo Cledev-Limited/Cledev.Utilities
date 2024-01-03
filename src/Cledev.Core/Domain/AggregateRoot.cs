@@ -45,7 +45,7 @@ public abstract class AggregateRoot : IAggregateRoot
         _uncommittedEvents.Add(@event);
         Apply(@event);
         AddReadModels(@event);
-        Version++;
+        Version++; // TODO: Should this be removed as new version number is assigned during aggregate saving?
     }
     
     public void LoadFromHistory(IEnumerable<IDomainEvent> domainEvents)
