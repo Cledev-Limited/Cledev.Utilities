@@ -1,5 +1,4 @@
-﻿using Cledev.Core.Domain.Store.EF;
-using Cledev.Examples.Server.Data.Entities;
+﻿using Cledev.Examples.Server.Data.Entities;
 using Duende.IdentityServer.EntityFramework.Options;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.EntityFrameworkCore;

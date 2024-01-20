@@ -79,12 +79,20 @@ public static class DomainDbContextExtensions
     private static async Task<Result<T>> GetAggregateStrongView<T>(this DomainDbContext domainDbContext, string id, int upToVersionNumber = -1) where T : IAggregateRoot
     {
         var eventEntities = upToVersionNumber > 0
-            ? await domainDbContext.Events.AsNoTracking().Where(eventEntity => eventEntity.AggregateRootId == id && eventEntity.Sequence <= upToVersionNumber).ToListAsync()
-            : await domainDbContext.Events.AsNoTracking().Where(eventEntity => eventEntity.AggregateRootId == id).ToListAsync();
+            ? await domainDbContext.Events.AsNoTracking()
+                .Where(eventEntity => eventEntity.AggregateRootId == id && eventEntity.Sequence <= upToVersionNumber)
+                .OrderBy(eventEntity => eventEntity.Sequence)
+                .ToListAsync()
+            : await domainDbContext.Events.AsNoTracking()
+                .Where(eventEntity => eventEntity.AggregateRootId == id)
+                .OrderBy(eventEntity => eventEntity.Sequence)
+                .ToListAsync();
+        
         if (eventEntities.Count == 0)
         {
             return new Failure(ErrorCodes.NotFound);
         }
+        
         var aggregate = Activator.CreateInstance<T>();          
         aggregate.LoadFromHistory(eventEntities.Select(eventEntity => (IDomainEvent)JsonConvert.DeserializeObject(eventEntity.Data, Type.GetType(eventEntity.Type)!)!));
         return aggregate;

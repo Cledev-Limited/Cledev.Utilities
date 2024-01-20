@@ -1,9 +1,4 @@
-﻿using Cledev.Core.Tests.Data;
-using Cledev.Core.Tests.Domain.TestItem;
-using Cledev.Core.Tests.Domain.TestItem.AddTestSubItem;
-using Cledev.Core.Tests.Domain.TestItem.CreateTestItem;
-using Cledev.Core.Tests.Domain.TestItem.UpdateTestItemName;
-using FluentAssertions;
+﻿using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.Time.Testing;
 using Xunit;

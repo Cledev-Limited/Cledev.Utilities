@@ -1,10 +1,5 @@
 ﻿using Cledev.Core.Data;
 using Cledev.Core.Domain;
-using Cledev.Core.Tests.Data.Entities;
-using Cledev.Core.Tests.Domain.TestItem.AddTestSubItem;
-using Cledev.Core.Tests.Domain.TestItem.CreateTestItem;
-using Cledev.Core.Tests.Domain.TestItem.UpdateTestItemDescription;
-using Cledev.Core.Tests.Domain.TestItem.UpdateTestItemName;
 
 namespace Cledev.Core.Tests.Domain.TestItem;
 
