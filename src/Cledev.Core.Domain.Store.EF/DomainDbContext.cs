@@ -110,15 +110,36 @@ public static class DomainDbContextExtensions
     
     public static async Task<Result> SaveAggregate(this DomainDbContext domainDbContext, AggregateRoot aggregateRoot, int expectedVersionNumber, CancellationToken cancellationToken = default)
     {
+        var startingVersionNumberResult = await domainDbContext.GetStartingVersionNumber(aggregateRoot, expectedVersionNumber, cancellationToken);
+        if (startingVersionNumberResult.IsNotSuccess)
+        {
+            return startingVersionNumberResult.Failure!;
+        }
+        var startingVersionNumber = startingVersionNumberResult.Value;
+
+        domainDbContext.SaveEntityForAggregate(aggregateRoot, startingVersionNumber);
+        domainDbContext.SaveEntitiesForEvents(aggregateRoot, startingVersionNumber);
+        domainDbContext.SaveEntitiesForReadModels(aggregateRoot);
+
+        await domainDbContext.SaveChangesAsync(cancellationToken);
+        
+        return Result.Ok();
+    }
+
+    private static async Task<Result<int>> GetStartingVersionNumber(this DomainDbContext domainDbContext, IAggregateRoot aggregateRoot, int expectedVersionNumber, CancellationToken cancellationToken = default)
+    {
         var currentVersionNumber = await domainDbContext.Events.CountAsync(eventEntity => eventEntity.AggregateRootId == aggregateRoot.Id, cancellationToken);
         if (currentVersionNumber != expectedVersionNumber)
         {
             return new Failure(Title: "Concurrency exception");
         }
-        var startingVersionNumber = expectedVersionNumber + 1;
-        
-        var aggregateEntity = aggregateRoot.ToAggregateEntity(version: startingVersionNumber);
-        if(startingVersionNumber > 1)
+        return expectedVersionNumber + 1;
+    }
+
+    private static void SaveEntityForAggregate(this DomainDbContext domainDbContext, IAggregateRoot aggregateRoot, int versionNumber)
+    {
+        var aggregateEntity = aggregateRoot.ToAggregateEntity(version: versionNumber);
+        if(versionNumber > 1)
         {
             domainDbContext.Aggregates.Update(aggregateEntity);
         }
@@ -126,7 +147,10 @@ public static class DomainDbContextExtensions
         {
             domainDbContext.Aggregates.Add(aggregateEntity);
         }
-
+    }
+    
+    private static void SaveEntitiesForEvents(this DomainDbContext domainDbContext, IAggregateRoot aggregateRoot, int startingVersionNumber)
+    {
         var domainEvents = aggregateRoot.UncommittedEvents.ToArray();
         for (var i = 0; i < domainEvents.Length; i++)
         {
@@ -134,7 +158,10 @@ public static class DomainDbContextExtensions
             var eventEntity = domainEvent.ToEventEntity(version: startingVersionNumber + i);
             domainDbContext.Events.Add(eventEntity);
         }
-
+    }
+    
+    private static void SaveEntitiesForReadModels(this DbContext domainDbContext, AggregateRoot aggregateRoot)
+    {
         foreach (var entity in aggregateRoot.ReadModels)
         {
             switch (entity.State)
@@ -149,13 +176,9 @@ public static class DomainDbContextExtensions
                     domainDbContext.Remove(entity);
                     break;
                 default:
-                    return new Failure(Title: "Invalid entity state");
+                    throw new ArgumentOutOfRangeException();
             }
         }
-        
-        await domainDbContext.SaveChangesAsync(cancellationToken);
-        
-        return Result.Ok();
     }
 }
 
