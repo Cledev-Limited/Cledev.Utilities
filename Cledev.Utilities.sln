@@ -38,6 +38,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cledev.Examples.Console", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cledev.Core.Domain.Store.EF", "src\Cledev.Core.Domain.Store.EF\Cledev.Core.Domain.Store.EF.csproj", "{46BA0D47-57A1-4034-A056-9B6C9CC007DF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{E91593AF-4BAC-4770-955C-82AE67BDC3F7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "misc\Benchmarks\Benchmarks.csproj", "{F1D06892-50D5-46CF-8BFE-31887EB292A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +84,10 @@ Global
 		{46BA0D47-57A1-4034-A056-9B6C9CC007DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46BA0D47-57A1-4034-A056-9B6C9CC007DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46BA0D47-57A1-4034-A056-9B6C9CC007DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1D06892-50D5-46CF-8BFE-31887EB292A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1D06892-50D5-46CF-8BFE-31887EB292A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1D06892-50D5-46CF-8BFE-31887EB292A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1D06892-50D5-46CF-8BFE-31887EB292A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -94,6 +102,7 @@ Global
 		{DC8CEDBA-A3F7-4B62-8699-D76263EC3039} = {77793EA5-204F-460C-A1D4-1F0D671A7FED}
 		{FBB0C44F-BFCF-46D8-9BC7-F351D77482B0} = {BA2F957E-0967-4F6E-AFD9-9D03B0C5B621}
 		{46BA0D47-57A1-4034-A056-9B6C9CC007DF} = {7C21F015-E13B-48B2-9B83-987D7E993847}
+		{F1D06892-50D5-46CF-8BFE-31887EB292A6} = {E91593AF-4BAC-4770-955C-82AE67BDC3F7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F713E156-D166-4FB2-BD40-611A6F55AAB2}
