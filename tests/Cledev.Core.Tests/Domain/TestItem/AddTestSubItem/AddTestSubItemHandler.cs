@@ -1,6 +1,7 @@
 ﻿using Cledev.Core.Domain.Store.EF;
 using Cledev.Core.Requests;
 using Cledev.Core.Results;
+using Cledev.Core.Tests.Data;
 
 namespace Cledev.Core.Tests.Domain.TestItem.AddTestSubItem;
 
@@ -15,14 +16,16 @@ public class AddTestSubItemHandler : IRequestHandler<AddTestSubItem>
 
     public async Task<Result> Handle(AddTestSubItem request, CancellationToken cancellationToken = default)
     {
-        var testItem = await _testDbContext.GetAggregate<TestItem>(request.Id, ReadMode.Strong);
-        if (testItem.IsNotSuccess)
+        var aggregate = await _testDbContext.GetAggregate<TestItem>(request.Id, ReadMode.Strong);
+        if (aggregate.IsNotSuccess)
         {
-            return testItem.Failure!;
+            return aggregate.Failure!;
         }
-        var expectedVersionNumber = testItem.Value!.Version;
-        testItem.Value!.AddSubItem(request.SubItemName);
-        var result = await _testDbContext.SaveAggregate(testItem.Value!, expectedVersionNumber, cancellationToken);
+        var testItem = aggregate.Value!;
+        
+        var expectedVersionNumber = testItem.Version;
+        testItem.AddSubItem(request.SubItemName);
+        var result = await _testDbContext.SaveAggregate(testItem, expectedVersionNumber, cancellationToken);
         return result;
     }
 }

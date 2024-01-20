@@ -117,9 +117,9 @@ public static class DomainDbContextExtensions
         }
         var startingVersionNumber = startingVersionNumberResult.Value;
 
-        domainDbContext.SaveEntityForAggregate(aggregateRoot, startingVersionNumber);
-        domainDbContext.SaveEntitiesForEvents(aggregateRoot, startingVersionNumber);
-        domainDbContext.SaveEntitiesForReadModels(aggregateRoot);
+        domainDbContext.TrackAggregate(aggregateRoot, startingVersionNumber);
+        domainDbContext.TrackEvents(aggregateRoot, startingVersionNumber);
+        domainDbContext.TrackReadModels(aggregateRoot);
 
         await domainDbContext.SaveChangesAsync(cancellationToken);
         
@@ -136,7 +136,7 @@ public static class DomainDbContextExtensions
         return expectedVersionNumber + 1;
     }
 
-    private static void SaveEntityForAggregate(this DomainDbContext domainDbContext, IAggregateRoot aggregateRoot, int versionNumber)
+    private static void TrackAggregate(this DomainDbContext domainDbContext, IAggregateRoot aggregateRoot, int versionNumber)
     {
         var aggregateEntity = aggregateRoot.ToAggregateEntity(version: versionNumber);
         if(versionNumber > 1)
@@ -149,7 +149,7 @@ public static class DomainDbContextExtensions
         }
     }
     
-    private static void SaveEntitiesForEvents(this DomainDbContext domainDbContext, IAggregateRoot aggregateRoot, int startingVersionNumber)
+    private static void TrackEvents(this DomainDbContext domainDbContext, IAggregateRoot aggregateRoot, int startingVersionNumber)
     {
         var domainEvents = aggregateRoot.UncommittedEvents.ToArray();
         for (var i = 0; i < domainEvents.Length; i++)
@@ -160,7 +160,7 @@ public static class DomainDbContextExtensions
         }
     }
     
-    private static void SaveEntitiesForReadModels(this DbContext domainDbContext, AggregateRoot aggregateRoot)
+    private static void TrackReadModels(this DbContext domainDbContext, AggregateRoot aggregateRoot)
     {
         foreach (var entity in aggregateRoot.ReadModels)
         {

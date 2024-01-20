@@ -1,5 +1,10 @@
 ﻿using Cledev.Core.Data;
 using Cledev.Core.Domain;
+using Cledev.Core.Tests.Data.Entities;
+using Cledev.Core.Tests.Domain.TestItem.AddTestSubItem;
+using Cledev.Core.Tests.Domain.TestItem.CreateTestItem;
+using Cledev.Core.Tests.Domain.TestItem.UpdateTestItemDescription;
+using Cledev.Core.Tests.Domain.TestItem.UpdateTestItemName;
 
 namespace Cledev.Core.Tests.Domain.TestItem;
 
@@ -51,7 +56,7 @@ public class TestItem : AggregateRoot
         });
     }
     
-    protected override bool Apply<T>(T @event)
+    protected override void Apply<T>(T @event)
     {
         switch (@event)
         {
@@ -74,11 +79,9 @@ public class TestItem : AggregateRoot
                 });
                 break;
         }
-
-        return true;
     }
 
-    protected override bool AddReadModels<T>(T @event)
+    protected override void AddReadModels<T>(T @event)
     {
         switch (@event)
         {
@@ -119,7 +122,5 @@ public class TestItem : AggregateRoot
                 });
                 break;
         }
-
-        return true;
     }
 }

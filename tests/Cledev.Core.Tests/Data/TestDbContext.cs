@@ -1,4 +1,5 @@
 using Cledev.Core.Domain.Store.EF;
+using Cledev.Core.Tests.Data.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
