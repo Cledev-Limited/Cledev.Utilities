@@ -56,8 +56,8 @@ public abstract class DomainDbContext : IdentityDbContext<IdentityUser>
                         auditableEntity.LastUpdatedBy = userId;
                         break;
                     case EntityState.Modified:
-                        Entry(auditableEntity).Property(x => x.CreatedDate).IsModified = false;
-                        Entry(auditableEntity).Property(x => x.CreatedBy).IsModified = false;
+                        Entry(auditableEntity).Property(entity => entity.CreatedDate).IsModified = false;
+                        Entry(auditableEntity).Property(entity => entity.CreatedBy).IsModified = false;
                         auditableEntity.LastUpdatedDate = utcNow;
                         auditableEntity.LastUpdatedBy = userId;
                         break;
@@ -71,26 +71,28 @@ public abstract class DomainDbContext : IdentityDbContext<IdentityUser>
 
 public static class DomainDbContextExtensions
 {
-    public static async Task<Result<T>> GetAggregate<T>(this DomainDbContext domainDbContext, string id, ReadMode readMode = ReadMode.Weak) where T : IAggregateRoot =>
-        readMode is ReadMode.Strong
+    public static async Task<Result<T>> GetAggregate<T>(this DomainDbContext domainDbContext, string id, ReadMode readMode = ReadMode.Weak, int upToVersionNumber = -1) where T : IAggregateRoot =>
+        readMode is ReadMode.Strong || upToVersionNumber > 0
             ? await domainDbContext.GetAggregateStrongView<T>(id)
             : await domainDbContext.GetAggregateWeakView<T>(id);
 
-    private static async Task<Result<T>> GetAggregateStrongView<T>(this DomainDbContext domainDbContext, string id) where T : IAggregateRoot
+    private static async Task<Result<T>> GetAggregateStrongView<T>(this DomainDbContext domainDbContext, string id, int upToVersionNumber = -1) where T : IAggregateRoot
     {
-        var eventEntities = await domainDbContext.Events.AsNoTracking().Where(x => x.AggregateRootId == id).ToListAsync();
+        var eventEntities = upToVersionNumber > 0
+            ? await domainDbContext.Events.AsNoTracking().Where(eventEntity => eventEntity.AggregateRootId == id && eventEntity.Sequence <= upToVersionNumber).ToListAsync()
+            : await domainDbContext.Events.AsNoTracking().Where(eventEntity => eventEntity.AggregateRootId == id).ToListAsync();
         if (eventEntities.Count == 0)
         {
             return new Failure(ErrorCodes.NotFound);
         }
         var aggregate = Activator.CreateInstance<T>();          
-        aggregate.LoadFromHistory(eventEntities.Select(x => (IDomainEvent)JsonConvert.DeserializeObject(x.Data, Type.GetType(x.Type)!)!));
+        aggregate.LoadFromHistory(eventEntities.Select(eventEntity => (IDomainEvent)JsonConvert.DeserializeObject(eventEntity.Data, Type.GetType(eventEntity.Type)!)!));
         return aggregate;
     }
 
     private static async Task<Result<T>> GetAggregateWeakView<T>(this DomainDbContext domainDbContext, string id) where T : IAggregateRoot
     {
-        var aggregateEntity = await domainDbContext.Aggregates.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        var aggregateEntity = await domainDbContext.Aggregates.AsNoTracking().FirstOrDefaultAsync(entity => entity.Id == id);
         if (aggregateEntity is null)
         {
             return new Failure(ErrorCodes.NotFound);
@@ -100,7 +102,7 @@ public static class DomainDbContextExtensions
     
     public static async Task<Result> SaveAggregate(this DomainDbContext domainDbContext, AggregateRoot aggregateRoot, int expectedVersionNumber, CancellationToken cancellationToken = default)
     {
-        var currentVersionNumber = await domainDbContext.Events.CountAsync(x => x.AggregateRootId == aggregateRoot.Id, cancellationToken);
+        var currentVersionNumber = await domainDbContext.Events.CountAsync(eventEntity => eventEntity.AggregateRootId == aggregateRoot.Id, cancellationToken);
         if (currentVersionNumber != expectedVersionNumber)
         {
             return new Failure(Title: "Concurrency exception");
