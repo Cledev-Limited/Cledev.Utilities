@@ -45,7 +45,6 @@ public abstract class AggregateRoot : IAggregateRoot
         _uncommittedEvents.Add(@event);
         Apply(@event);
         AddReadModels(@event);
-        Version++;
     }
     
     public void LoadFromHistory(IEnumerable<IDomainEvent> domainEvents)
@@ -59,6 +58,6 @@ public abstract class AggregateRoot : IAggregateRoot
         }
     }
     
-    protected abstract bool Apply<T>(T @event) where T : IDomainEvent;
-    protected abstract bool AddReadModels<T>(T @event) where T : IDomainEvent;
+    protected abstract void Apply<T>(T @event) where T : IDomainEvent;
+    protected abstract void AddReadModels<T>(T @event) where T : IDomainEvent;
 }
