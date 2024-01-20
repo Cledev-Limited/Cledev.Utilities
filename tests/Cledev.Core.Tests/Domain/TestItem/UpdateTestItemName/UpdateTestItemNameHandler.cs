@@ -15,14 +15,16 @@ public class UpdateTestItemNameHandler : IRequestHandler<UpdateTestItemName>
 
     public async Task<Result> Handle(UpdateTestItemName request, CancellationToken cancellationToken = default)
     {
-        var testItem = await _testDbContext.GetAggregate<TestItem>(request.Id, ReadMode.Strong);
-        if (testItem.IsNotSuccess)
+        var aggregate = await _testDbContext.GetAggregate<TestItem>(request.Id, ReadMode.Strong);
+        if (aggregate.IsNotSuccess)
         {
-            return testItem.Failure!;
+            return aggregate.Failure!;
         }
-        var expectedVersionNumber = testItem.Value!.Version;
-        testItem.Value!.UpdateName(request.Name);
-        var result = await _testDbContext.SaveAggregate(testItem.Value!, expectedVersionNumber, cancellationToken);
+        var testItem = aggregate.Value!;
+        
+        var expectedVersionNumber = testItem.Version;
+        testItem.UpdateName(request.Name);
+        var result = await _testDbContext.SaveAggregate(testItem, expectedVersionNumber, cancellationToken);
         return result;
     }
 }
