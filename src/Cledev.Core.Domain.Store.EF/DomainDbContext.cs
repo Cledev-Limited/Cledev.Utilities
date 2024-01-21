@@ -11,17 +11,12 @@ using Newtonsoft.Json;
 
 namespace Cledev.Core.Domain.Store.EF;
 
-public abstract class DomainDbContext : IdentityDbContext<IdentityUser>
+public abstract class DomainDbContext(
+    DbContextOptions<DomainDbContext> options,
+    TimeProvider timeProvider,
+    IHttpContextAccessor httpContextAccessor)
+    : IdentityDbContext<IdentityUser>(options)
 {
-    private readonly TimeProvider _timeProvider;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    protected DomainDbContext(DbContextOptions<DomainDbContext> options, TimeProvider timeProvider, IHttpContextAccessor httpContextAccessor) : base(options)
-    {
-        _timeProvider = timeProvider;
-        _httpContextAccessor = httpContextAccessor;
-    }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -40,8 +35,8 @@ public abstract class DomainDbContext : IdentityDbContext<IdentityUser>
     
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var utcNow = _timeProvider.GetUtcNow();
-        var userId = _httpContextAccessor.GetCurrentUserId();
+        var utcNow = timeProvider.GetUtcNow();
+        var userId = httpContextAccessor.GetCurrentUserId();
 
         foreach (var changedEntity in ChangeTracker.Entries())
         {

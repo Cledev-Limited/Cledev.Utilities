@@ -2,16 +2,9 @@
 
 namespace Cledev.Core.Streams;
 
-public class StreamCreator : IStreamCreator
+public class StreamCreator(IServiceProvider serviceProvider) : IStreamCreator
 {
-    private readonly IServiceProvider _serviceProvider;
-
     private static readonly ConcurrentDictionary<Type, object?> StreamHandlerWrappers = new();
-
-    public StreamCreator(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
 
     public IAsyncEnumerable<TResponse> Create<TResponse>(IStreamRequest<TResponse> request, CancellationToken cancellationToken = default)
     {
@@ -24,6 +17,6 @@ public class StreamCreator : IStreamCreator
         var handler = (StreamRequestHandlerWrapperBase<TResponse>)StreamHandlerWrappers.GetOrAdd(streamRequestType, _ => 
             Activator.CreateInstance(typeof(StreamRequestHandlerWrapper<,>).MakeGenericType(streamRequestType, typeof(TResponse))))!;
 
-        return handler.Handle(request, _serviceProvider, cancellationToken);
+        return handler.Handle(request, serviceProvider, cancellationToken);
     }
 }

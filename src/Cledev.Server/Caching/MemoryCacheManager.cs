@@ -2,15 +2,11 @@
 
 namespace Cledev.Server.Caching;
 
-public class MemoryCacheManager : ICacheManager
+public class MemoryCacheManager(IMemoryCache memoryCache) : ICacheManager
 {
-    private readonly IMemoryCache _memoryCache;
-
-    public MemoryCacheManager(IMemoryCache memoryCache) => _memoryCache = memoryCache;
-
     public async Task<T?> GetOrSetAsync<T>(string cacheKey, TimeSpan cacheTime, Func<Task<T>> acquireAsync)
     {
-        if (_memoryCache.TryGetValue(cacheKey, out T? data))
+        if (memoryCache.TryGetValue(cacheKey, out T? data))
         {
             return data;
         }
@@ -19,13 +15,13 @@ public class MemoryCacheManager : ICacheManager
 
         var memoryCacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(cacheTime);
 
-        _memoryCache.Set(cacheKey, data, memoryCacheEntryOptions);
+        memoryCache.Set(cacheKey, data, memoryCacheEntryOptions);
 
         return data;
     }
 
     public void Remove(string key)
     {
-        _memoryCache.Remove(key);
+        memoryCache.Remove(key);
     }
 }

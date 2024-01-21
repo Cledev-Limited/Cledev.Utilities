@@ -30,20 +30,11 @@ public interface IEmailService
         IDictionary<string, string>? emailHeaders = null);
 }
 
-public class EmailService : IEmailService
+public class EmailService(EMailSettings settings, ILogger<EmailService> logger) : IEmailService
 {
-    private readonly EMailSettings _settings;
-    private readonly ILogger<EmailService> _logger;
-
     [ActivatorUtilitiesConstructor]
     public EmailService(IOptions<EMailSettings> settings, ILogger<EmailService> logger) : this(settings.Value, logger)
     {
-    }
-    
-    public EmailService(EMailSettings settings, ILogger<EmailService> logger)
-    {
-        _settings = settings;
-        _logger = logger;
     }
 
     public async Task SendEmail(string subject, string body, string toAddress)
@@ -65,7 +56,7 @@ public class EmailService : IEmailService
         {
             var message = new MailMessage
             {
-                From = new MailAddress(_settings.Address, _settings.DisplayName),
+                From = new MailAddress(settings.Address, settings.DisplayName),
                 Subject = subject,
                 Body = body,
                 IsBodyHtml = true,
@@ -80,11 +71,11 @@ public class EmailService : IEmailService
 
             var client = new SmtpClient
             {
-                Port = _settings.Port,
-                Host = _settings.Host,
+                Port = settings.Port,
+                Host = settings.Host,
                 EnableSsl = true,
                 UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(_settings.Address, _settings.Password),
+                Credentials = new NetworkCredential(settings.Address, settings.Password),
                 DeliveryMethod = SmtpDeliveryMethod.Network
             };
 
@@ -92,7 +83,7 @@ public class EmailService : IEmailService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            logger.LogError(ex.Message);
             throw;
         }
     }

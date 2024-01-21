@@ -13,22 +13,13 @@ public interface IApplicationService
     Task<ActionResult> ProcessRequest<TResponse>(IRequest<TResponse> request, bool validateRequest = false, CancellationToken cancellationToken = default);
 }
 
-public class ApplicationService : IApplicationService
+public class ApplicationService(IServiceProvider serviceProvider, IDispatcher dispatcher) : IApplicationService
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly IDispatcher _dispatcher;
-
-    public ApplicationService(IServiceProvider serviceProvider, IDispatcher dispatcher)
-    {
-        _serviceProvider = serviceProvider;
-        _dispatcher = dispatcher;
-    }
-
     public async Task<ActionResult> ProcessRequest<TRequest>(TRequest request, bool validateRequest = false, CancellationToken cancellationToken = default) where TRequest : IRequest
     {
         if (validateRequest)
         {
-            var validator = _serviceProvider.GetService<IValidator<TRequest>?>();
+            var validator = serviceProvider.GetService<IValidator<TRequest>?>();
             if (validator is null)
             {
                 throw new Exception("Request validator not found.");
@@ -41,7 +32,7 @@ public class ApplicationService : IApplicationService
             }
         }
         
-        var requestResult = await _dispatcher.Send(request, cancellationToken);
+        var requestResult = await dispatcher.Send(request, cancellationToken);
 
         requestResult.UpdateActivityIfNeeded();
         
@@ -52,7 +43,7 @@ public class ApplicationService : IApplicationService
     {
         if (validateRequest)
         {
-            var validator = _serviceProvider.GetService<IValidator<IRequest<TResponse>>?>();
+            var validator = serviceProvider.GetService<IValidator<IRequest<TResponse>>?>();
             if (validator is null)
             {
                 throw new Exception("Request validator not found.");
@@ -65,7 +56,7 @@ public class ApplicationService : IApplicationService
             }          
         }
         
-        var requestResult = await _dispatcher.Send(request, cancellationToken);
+        var requestResult = await dispatcher.Send(request, cancellationToken);
 
         requestResult.UpdateActivityIfNeeded();
         

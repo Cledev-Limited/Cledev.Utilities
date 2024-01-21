@@ -5,18 +5,11 @@ using Cledev.Core.Tests.Data;
 
 namespace Cledev.Core.Tests.Domain.TestItem.UpdateTestItemName;
 
-public class UpdateTestItemNameHandler : IRequestHandler<UpdateTestItemName>
+public class UpdateTestItemNameHandler(TestDbContext testDbContext) : IRequestHandler<UpdateTestItemName>
 {
-    private readonly TestDbContext _testDbContext;
-
-    public UpdateTestItemNameHandler(TestDbContext testDbContext)
-    {
-        _testDbContext = testDbContext;
-    }
-
     public async Task<Result> Handle(UpdateTestItemName request, CancellationToken cancellationToken = default)
     {
-        var aggregate = await _testDbContext.GetAggregate<TestItem>(request.Id, ReadMode.Strong);
+        var aggregate = await testDbContext.GetAggregate<TestItem>(request.Id, ReadMode.Strong);
         if (aggregate.IsNotSuccess)
         {
             return aggregate.Failure!;
@@ -25,7 +18,7 @@ public class UpdateTestItemNameHandler : IRequestHandler<UpdateTestItemName>
         
         var expectedVersionNumber = testItem.Version;
         testItem.UpdateName(request.Name);
-        var result = await _testDbContext.SaveAggregate(testItem, expectedVersionNumber, cancellationToken);
+        var result = await testDbContext.SaveAggregate(testItem, expectedVersionNumber, cancellationToken);
         return result;
     }
 }

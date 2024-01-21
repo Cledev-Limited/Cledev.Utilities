@@ -7,22 +7,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cledev.Examples.Server.Handlers;
 
-public class GetAllItemsHandler : IRequestHandler<GetAllItems, GetAllItemsResponse>
+public class GetAllItemsHandler(ApplicationDbContext dbContext, ICacheManager cacheManager)
+    : IRequestHandler<GetAllItems, GetAllItemsResponse>
 {
-    private readonly ApplicationDbContext _dbContext;
-    private readonly ICacheManager _cacheManager;
-
-    public GetAllItemsHandler(ApplicationDbContext dbContext, ICacheManager cacheManager)
-    {
-        _dbContext = dbContext;
-        _cacheManager = cacheManager;
-    }
-
     public async Task<Result<GetAllItemsResponse>> Handle(GetAllItems query, CancellationToken cancellationToken)
     {
         async Task<GetAllItemsResponse?> GetAllItemsAsync()
         {
-            var items = await _dbContext.Items.ToListAsync(cancellationToken);
+            var items = await dbContext.Items.ToListAsync(cancellationToken);
 
             return new GetAllItemsResponse
             {
@@ -30,6 +22,6 @@ public class GetAllItemsHandler : IRequestHandler<GetAllItems, GetAllItemsRespon
             };
         }
 
-        return (await _cacheManager.GetOrSetAsync(cacheKey: "Items", cacheTime: TimeSpan.FromSeconds(60), acquireAsync: GetAllItemsAsync))!;
+        return (await cacheManager.GetOrSetAsync(cacheKey: "Items", cacheTime: TimeSpan.FromSeconds(60), acquireAsync: GetAllItemsAsync))!;
     }
 }

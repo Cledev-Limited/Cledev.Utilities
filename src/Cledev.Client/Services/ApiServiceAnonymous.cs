@@ -2,17 +2,10 @@
 
 namespace Cledev.Client.Services;
 
-public class ApiServiceAnonymous
+public class ApiServiceAnonymous(HttpClient httpClient)
 {
-    private readonly HttpClient _httpClient;
-
-    public ApiServiceAnonymous(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
-
     public async Task<T?> GetFromJsonAsync<T>(string requestUri)
     {
-        return await _httpClient.GetFromJsonAsync<T>(requestUri);
+        return await httpClient.GetFromJsonAsync<T>(requestUri);
     }
 }

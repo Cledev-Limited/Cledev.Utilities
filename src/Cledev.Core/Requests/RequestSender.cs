@@ -4,16 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Cledev.Core.Requests;
 
-public class RequestSender : IRequestSender
+public class RequestSender(IServiceProvider serviceProvider) : IRequestSender
 {
-    private readonly IServiceProvider _serviceProvider;
-
     private static readonly ConcurrentDictionary<Type, object?> RequestHandlerWrappers = new();
-    
-    public RequestSender(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
 
     public async Task<Result> Send<TRequest>(TRequest request, CancellationToken cancellationToken = default) where TRequest : IRequest
     {
@@ -22,7 +15,7 @@ public class RequestSender : IRequestSender
             throw new ArgumentNullException(nameof(request));
         }
         
-        var handler = _serviceProvider.GetService<IRequestHandler<TRequest>>();
+        var handler = serviceProvider.GetService<IRequestHandler<TRequest>>();
 
         if (handler is null)
         {
@@ -44,7 +37,7 @@ public class RequestSender : IRequestSender
         var handler = (RequestHandlerWrapperBase<TResponse>)RequestHandlerWrappers.GetOrAdd(requestType, _ => 
             Activator.CreateInstance(typeof(RequestHandlerWrapper<,>).MakeGenericType(requestType, typeof(TResponse))))!;
 
-        var result = await handler.Handle(request, _serviceProvider, cancellationToken);
+        var result = await handler.Handle(request, serviceProvider, cancellationToken);
 
         return result;
     }

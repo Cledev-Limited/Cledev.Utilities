@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cledev.Core.Tests.Data;
 
-public sealed class TestDbContext : DomainDbContext
+public sealed class TestDbContext(
+    DbContextOptions<DomainDbContext> options,
+    TimeProvider timeProvider,
+    IHttpContextAccessor httpContextAccessor)
+    : DomainDbContext(options, timeProvider, httpContextAccessor)
 {
-    public TestDbContext(DbContextOptions<DomainDbContext> options, TimeProvider timeProvider, IHttpContextAccessor httpContextAccessor) : base(options, timeProvider, httpContextAccessor)
-    {
-    }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

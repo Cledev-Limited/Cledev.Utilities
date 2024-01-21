@@ -6,18 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cledev.Examples.Server.Handlers;
 
-public class GetUpdateItemHandler : IRequestHandler<GetUpdateItem, UpdateItem>
+public class GetUpdateItemHandler(ApplicationDbContext dbContext) : IRequestHandler<GetUpdateItem, UpdateItem>
 {
-    private readonly ApplicationDbContext _dbContext;
-
-    public GetUpdateItemHandler(ApplicationDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
     public async Task<Result<UpdateItem>> Handle(GetUpdateItem query, CancellationToken cancellationToken)
     {
-        var item = await _dbContext.Items.SingleOrDefaultAsync(item => item.Id == query.Id, cancellationToken);
+        var item = await dbContext.Items.SingleOrDefaultAsync(item => item.Id == query.Id, cancellationToken);
 
         if (item is null)
         {

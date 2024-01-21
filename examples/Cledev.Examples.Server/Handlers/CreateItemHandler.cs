@@ -6,19 +6,15 @@ using Cledev.Examples.Shared;
 
 namespace Cledev.Examples.Server.Handlers;
 
-public class CreateItemHandler : IRequestHandler<CreateItem>
+public class CreateItemHandler(ApplicationDbContext dbContext) : IRequestHandler<CreateItem>
 {
-    private readonly ApplicationDbContext _dbContext;
-
-    public CreateItemHandler(ApplicationDbContext dbContext) => _dbContext = dbContext;
-
     public async Task<Result> Handle(CreateItem command, CancellationToken cancellationToken)
     {
         var item = new Item(Guid.NewGuid(), command.Name!, command.Description!);
 
-        _dbContext.Items.Add(item);
+        dbContext.Items.Add(item);
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Ok();
     }

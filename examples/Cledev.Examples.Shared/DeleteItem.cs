@@ -3,14 +3,9 @@ using Cledev.Core.Requests;
 
 namespace Cledev.Examples.Shared;
 
-public class DeleteItem : IRequest
+public class DeleteItem(Guid id) : IRequest
 {
-    public Guid Id { get; }
-
-    public DeleteItem(Guid id)
-    {
-        Id = id;
-    }
+    public Guid Id { get; } = id;
 }
 
 public record ItemDeleted(Guid Id) : NotificationBase;

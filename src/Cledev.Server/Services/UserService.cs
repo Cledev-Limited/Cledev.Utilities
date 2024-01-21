@@ -10,19 +10,14 @@ public interface IUserService
     bool UserIsAuthenticated();
 }
 
-public class UserService : IUserService
+public class UserService(IHttpContextAccessor httpContextAccessor) : IUserService
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public UserService(IHttpContextAccessor httpContextAccessor) => 
-        _httpContextAccessor = httpContextAccessor;
-
     public string? GetCurrentIdentityUserId() =>
-        _httpContextAccessor.GetCurrentUserId();
+        httpContextAccessor.GetCurrentUserId();
 
     public string? GetCurrentIdentityUserEmail() =>
-        _httpContextAccessor.GetCurrentUserEmail();
+        httpContextAccessor.GetCurrentUserEmail();
 
     public bool UserIsAuthenticated() => 
-        _httpContextAccessor.UserIsAuthenticated();
+        httpContextAccessor.UserIsAuthenticated();
 }

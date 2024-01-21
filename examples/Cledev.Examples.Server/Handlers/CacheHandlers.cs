@@ -5,18 +5,11 @@ using Cledev.Server.Caching;
 
 namespace Cledev.Examples.Server.Handlers;
 
-public class CacheHandlers : 
+public class CacheHandlers(ICacheManager cacheManager) :
     INotificationHandler<ItemCreated>,
     INotificationHandler<ItemDeleted>,
     INotificationHandler<ItemUpdated>
 {
-    private readonly ICacheManager _cacheManager;
-
-    public CacheHandlers(ICacheManager cacheManager)
-    {
-        _cacheManager = cacheManager;
-    }
-
     public async Task<Result> Handle(ItemCreated @event, CancellationToken cancellationToken) => 
         await ClearItemsCache();
 
@@ -29,7 +22,7 @@ public class CacheHandlers :
     private async Task<Result> ClearItemsCache()
     {
         await Task.CompletedTask;
-        _cacheManager.Remove("Items");
+        cacheManager.Remove("Items");
         return Result.Ok();
     }
 }

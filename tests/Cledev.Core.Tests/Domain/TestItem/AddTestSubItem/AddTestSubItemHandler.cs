@@ -5,18 +5,11 @@ using Cledev.Core.Tests.Data;
 
 namespace Cledev.Core.Tests.Domain.TestItem.AddTestSubItem;
 
-public class AddTestSubItemHandler : IRequestHandler<AddTestSubItem>
+public class AddTestSubItemHandler(TestDbContext testDbContext) : IRequestHandler<AddTestSubItem>
 {
-    private readonly TestDbContext _testDbContext;
-
-    public AddTestSubItemHandler(TestDbContext testDbContext)
-    {
-        _testDbContext = testDbContext;
-    }
-
     public async Task<Result> Handle(AddTestSubItem request, CancellationToken cancellationToken = default)
     {
-        var aggregate = await _testDbContext.GetAggregate<TestItem>(request.Id, ReadMode.Strong);
+        var aggregate = await testDbContext.GetAggregate<TestItem>(request.Id, ReadMode.Strong);
         if (aggregate.IsNotSuccess)
         {
             return aggregate.Failure!;
@@ -25,7 +18,7 @@ public class AddTestSubItemHandler : IRequestHandler<AddTestSubItem>
         
         var expectedVersionNumber = testItem.Version;
         testItem.AddSubItem(request.SubItemName);
-        var result = await _testDbContext.SaveAggregate(testItem, expectedVersionNumber, cancellationToken);
+        var result = await testDbContext.SaveAggregate(testItem, expectedVersionNumber, cancellationToken);
         return result;
     }
 }
