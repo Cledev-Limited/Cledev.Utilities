@@ -19,11 +19,11 @@ public abstract class AggregateRoot : IAggregateRoot
     
     [JsonIgnore]
     public IEnumerable<IDomainEvent> UncommittedEvents => _uncommittedEvents.AsReadOnly();
-    private readonly List<IDomainEvent> _uncommittedEvents = new();
+    private readonly List<IDomainEvent> _uncommittedEvents = [];
     
     [JsonIgnore]
-    public IEnumerable<IEntity> ReadModels => _readModels.AsReadOnly();
-    protected readonly List<IEntity> _readModels = new();
+    public IEnumerable<IEntity> UncommittedReadModels => _uncommittedReadModels.AsReadOnly();
+    protected readonly List<IEntity> _uncommittedReadModels = [];
     
     protected AggregateRoot()
     {
@@ -47,10 +47,8 @@ public abstract class AggregateRoot : IAggregateRoot
         AddReadModels(@event);
     }
     
-    public void LoadFromHistory(IEnumerable<IDomainEvent> domainEvents)
+    public void LoadFromHistory(IEnumerable<IDomainEvent> events)
     {
-        var events = domainEvents as IDomainEvent[] ?? domainEvents.ToArray();
-
         foreach (var @event in events)
         {
             Apply(@event);

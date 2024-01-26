@@ -27,7 +27,11 @@ public abstract class DomainDbContext(
         
         modelBuilder
             .Entity<EventEntity>()
-            .ToTable(name: "Events");
+            .ToTable(name: "Events")
+            .HasOne(x => x.AggregateEntity)
+            .WithMany(x => x.EventEntities)
+            .OnDelete(DeleteBehavior.NoAction)
+            .IsRequired();
     }
     
     public DbSet<AggregateEntity> Aggregates { get; set; } = null!;
@@ -157,7 +161,7 @@ public static class DomainDbContextExtensions
     
     private static void TrackReadModels(this DbContext domainDbContext, AggregateRoot aggregateRoot)
     {
-        foreach (var entity in aggregateRoot.ReadModels)
+        foreach (var entity in aggregateRoot.UncommittedReadModels)
         {
             switch (entity.State)
             {

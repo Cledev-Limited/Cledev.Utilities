@@ -14,7 +14,7 @@ public class TestItem : AggregateRoot
     public string Description { get; set; } = null!;
 
     public IEnumerable<TestSubItem> SubItems => _subItems.AsReadOnly();
-    private readonly List<TestSubItem> _subItems = new();
+    private readonly List<TestSubItem> _subItems = [];
     
     public TestItem() { }
 
@@ -86,7 +86,7 @@ public class TestItem : AggregateRoot
         switch (@event)
         {
             case TestItemCreated itemCreated:
-                _readModels.Add(new TestItemEntity
+                _uncommittedReadModels.Add(new TestItemEntity
                 {
                     Id = itemCreated.AggregateRootId,
                     Name = itemCreated.Name,
@@ -95,7 +95,7 @@ public class TestItem : AggregateRoot
                 });
                 break;
             case TestItemNameUpdated itemNameUpdated:
-                _readModels.Add(new TestItemEntity
+                _uncommittedReadModels.Add(new TestItemEntity
                 {
                     Id = itemNameUpdated.AggregateRootId,
                     Name = itemNameUpdated.Name,
@@ -104,7 +104,7 @@ public class TestItem : AggregateRoot
                 });
                 break;
             case TestItemDescriptionUpdated itemDescriptionUpdated:
-                _readModels.Add(new TestItemEntity
+                _uncommittedReadModels.Add(new TestItemEntity
                 {
                     Id = itemDescriptionUpdated.AggregateRootId,
                     Name = Name,
@@ -113,7 +113,7 @@ public class TestItem : AggregateRoot
                 });                
                 break;
             case TestSubItemAdded subItemAdded:
-                _readModels.Add(new TestSubItemEntity
+                _uncommittedReadModels.Add(new TestSubItemEntity
                 {
                     Id = subItemAdded.SubItemId,
                     Name = subItemAdded.SubItemName,

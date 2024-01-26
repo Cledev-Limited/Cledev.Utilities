@@ -10,4 +10,6 @@ public class EventEntity
     public DateTimeOffset TimeStamp { get; set; }
     public string? UserId { get; set; }
     public string? Source { get; set; }
+
+    public virtual AggregateEntity AggregateEntity { get; set; } = null!;
 }
