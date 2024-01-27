@@ -10,7 +10,7 @@ public static class DomainEventExtensions
         return new EventEntity
         {
             Id = @event.Id,
-            AggregateRootId = @event.AggregateRootId,
+            AggregateEntityId = @event.AggregateRootId,
             Sequence = version,
             Type = @event.GetType().AssemblyQualifiedName ?? throw new InvalidOperationException(),
             Data = JsonConvert.SerializeObject(@event),

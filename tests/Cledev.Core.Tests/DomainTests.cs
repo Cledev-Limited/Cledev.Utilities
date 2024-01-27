@@ -28,7 +28,7 @@ public class DomainTests
 
         var testItem = dbContext.Items.FirstOrDefault(i => i.Id == createTestItem.Id);
         var aggregate = dbContext.Aggregates.FirstOrDefault(a => a.Id == createTestItem.Id);
-        var @event = dbContext.Events.FirstOrDefault(a => a.AggregateRootId == createTestItem.Id);
+        var @event = dbContext.Events.FirstOrDefault(a => a.AggregateEntityId == createTestItem.Id);
 
         using (new AssertionScope())
         {
@@ -74,7 +74,7 @@ public class DomainTests
 
         var testItem = dbContext2.Items.FirstOrDefault(i => i.Id == createTestItem.Id);
         var aggregate = dbContext2.Aggregates.FirstOrDefault(a => a.Id == createTestItem.Id);
-        var @event = dbContext2.Events.LastOrDefault(a => a.AggregateRootId == createTestItem.Id);
+        var @event = dbContext2.Events.LastOrDefault(a => a.AggregateEntityId == createTestItem.Id);
 
         using (new AssertionScope())
         {
@@ -120,7 +120,7 @@ public class DomainTests
 
         var testSubItem = dbContext2.SubItems.FirstOrDefault(i => i.TestItemId == createTestItem.Id);
         var aggregate = dbContext2.Aggregates.FirstOrDefault(a => a.Id == createTestItem.Id);
-        var @event = dbContext2.Events.LastOrDefault(a => a.AggregateRootId == createTestItem.Id);
+        var @event = dbContext2.Events.LastOrDefault(a => a.AggregateEntityId == createTestItem.Id);
 
         using (new AssertionScope())
         {

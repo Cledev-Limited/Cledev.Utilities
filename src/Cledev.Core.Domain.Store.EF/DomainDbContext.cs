@@ -72,18 +72,18 @@ public static class DomainDbContextExtensions
 {
     public static async Task<Result<T>> GetAggregate<T>(this DomainDbContext domainDbContext, string id, ReadMode readMode = ReadMode.Weak, int upToVersionNumber = -1) where T : IAggregateRoot =>
         readMode is ReadMode.Strong || upToVersionNumber > 0
-            ? await domainDbContext.GetAggregateStrongView<T>(id)
+            ? await domainDbContext.GetAggregateStrongView<T>(id, upToVersionNumber)
             : await domainDbContext.GetAggregateWeakView<T>(id);
 
     private static async Task<Result<T>> GetAggregateStrongView<T>(this DomainDbContext domainDbContext, string id, int upToVersionNumber = -1) where T : IAggregateRoot
     {
         var eventEntities = upToVersionNumber > 0
             ? await domainDbContext.Events.AsNoTracking()
-                .Where(eventEntity => eventEntity.AggregateRootId == id && eventEntity.Sequence <= upToVersionNumber)
+                .Where(eventEntity => eventEntity.AggregateEntityId == id && eventEntity.Sequence <= upToVersionNumber)
                 .OrderBy(eventEntity => eventEntity.Sequence)
                 .ToListAsync()
             : await domainDbContext.Events.AsNoTracking()
-                .Where(eventEntity => eventEntity.AggregateRootId == id)
+                .Where(eventEntity => eventEntity.AggregateEntityId == id)
                 .OrderBy(eventEntity => eventEntity.Sequence)
                 .ToListAsync();
         
@@ -127,7 +127,7 @@ public static class DomainDbContextExtensions
 
     private static async Task<Result<int>> GetStartingVersionNumber(this DomainDbContext domainDbContext, IAggregateRoot aggregateRoot, int expectedVersionNumber, CancellationToken cancellationToken = default)
     {
-        var currentVersionNumber = await domainDbContext.Events.CountAsync(eventEntity => eventEntity.AggregateRootId == aggregateRoot.Id, cancellationToken);
+        var currentVersionNumber = await domainDbContext.Events.AsNoTracking().CountAsync(eventEntity => eventEntity.AggregateEntityId == aggregateRoot.Id, cancellationToken);
         if (currentVersionNumber != expectedVersionNumber)
         {
             return new Failure(Title: "Concurrency exception");
@@ -161,7 +161,7 @@ public static class DomainDbContextExtensions
     
     private static void TrackReadModels(this DbContext domainDbContext, AggregateRoot aggregateRoot)
     {
-        foreach (var entity in aggregateRoot.UncommittedReadModels)
+        foreach (var entity in aggregateRoot.UncommittedEntities)
         {
             switch (entity.State)
             {

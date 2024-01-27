@@ -56,7 +56,7 @@ public class TestItem : AggregateRoot
         });
     }
     
-    protected override void Apply<T>(T @event)
+    protected override void ApplyEvent<T>(T @event)
     {
         switch (@event)
         {
@@ -81,12 +81,12 @@ public class TestItem : AggregateRoot
         }
     }
 
-    protected override void AddReadModels<T>(T @event)
+    protected override void AddEntities<T>(T @event)
     {
         switch (@event)
         {
             case TestItemCreated itemCreated:
-                _uncommittedReadModels.Add(new TestItemEntity
+                _uncommittedEntities.Add(new TestItemEntity
                 {
                     Id = itemCreated.AggregateRootId,
                     Name = itemCreated.Name,
@@ -95,7 +95,7 @@ public class TestItem : AggregateRoot
                 });
                 break;
             case TestItemNameUpdated itemNameUpdated:
-                _uncommittedReadModels.Add(new TestItemEntity
+                _uncommittedEntities.Add(new TestItemEntity
                 {
                     Id = itemNameUpdated.AggregateRootId,
                     Name = itemNameUpdated.Name,
@@ -104,7 +104,7 @@ public class TestItem : AggregateRoot
                 });
                 break;
             case TestItemDescriptionUpdated itemDescriptionUpdated:
-                _uncommittedReadModels.Add(new TestItemEntity
+                _uncommittedEntities.Add(new TestItemEntity
                 {
                     Id = itemDescriptionUpdated.AggregateRootId,
                     Name = Name,
@@ -113,7 +113,7 @@ public class TestItem : AggregateRoot
                 });                
                 break;
             case TestSubItemAdded subItemAdded:
-                _uncommittedReadModels.Add(new TestSubItemEntity
+                _uncommittedEntities.Add(new TestSubItemEntity
                 {
                     Id = subItemAdded.SubItemId,
                     Name = subItemAdded.SubItemName,
