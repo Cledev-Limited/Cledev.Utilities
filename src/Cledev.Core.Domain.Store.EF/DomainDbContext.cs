@@ -118,7 +118,7 @@ public static class DomainDbContextExtensions
 
         domainDbContext.TrackAggregate(aggregateRoot, startingVersionNumber);
         domainDbContext.TrackEvents(aggregateRoot, startingVersionNumber);
-        domainDbContext.TrackReadModels(aggregateRoot);
+        domainDbContext.TrackEntities(aggregateRoot);
 
         await domainDbContext.SaveChangesAsync(cancellationToken);
         
@@ -159,7 +159,7 @@ public static class DomainDbContextExtensions
         }
     }
     
-    private static void TrackReadModels(this DbContext domainDbContext, AggregateRoot aggregateRoot)
+    private static void TrackEntities(this DbContext domainDbContext, AggregateRoot aggregateRoot)
     {
         foreach (var entity in aggregateRoot.UncommittedEntities)
         {
