@@ -70,6 +70,7 @@ public abstract class DomainDbContext(
     }
 }
 
+// TODO: Move to a domain repository
 public static class DomainDbContextExtensions
 {
     public static async Task<Result<T>> GetAggregate<T>(this DomainDbContext domainDbContext, string id, ReadMode readMode = ReadMode.Weak, int upToVersionNumber = -1) where T : IAggregateRoot =>

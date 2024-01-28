@@ -6,6 +6,4 @@ public class AggregateEntity : AuditableEntity
     public int Version { get; set; }
     public string Type { get; set; } = null!;
     public string Data { get; set; } = null!;
-    
-    // public virtual ICollection<EventEntity> EventEntities { get; set; } = new List<EventEntity>();
 }
