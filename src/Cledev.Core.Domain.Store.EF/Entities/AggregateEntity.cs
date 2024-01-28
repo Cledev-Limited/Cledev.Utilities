@@ -7,5 +7,5 @@ public class AggregateEntity : AuditableEntity
     public string Type { get; set; } = null!;
     public string Data { get; set; } = null!;
     
-    public virtual ICollection<EventEntity> EventEntities { get; set; } = new List<EventEntity>();
+    // public virtual ICollection<EventEntity> EventEntities { get; set; } = new List<EventEntity>();
 }

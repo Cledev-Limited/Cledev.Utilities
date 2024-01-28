@@ -5,6 +5,7 @@ using Cledev.Core.Tests.Domain.TestItem.CreateTestItem;
 using Cledev.Core.Tests.Domain.TestItem.UpdateTestItemName;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Time.Testing;
 using Xunit;
 
@@ -28,7 +29,7 @@ public class DomainTests
 
         var testItem = dbContext.Items.FirstOrDefault(i => i.Id == createTestItem.Id);
         var aggregate = dbContext.Aggregates.FirstOrDefault(a => a.Id == createTestItem.Id);
-        var @event = dbContext.Events.FirstOrDefault(a => a.AggregateEntityId == createTestItem.Id);
+        var aggregateEvent = dbContext.AggregateEvents.Include(x => x.EventEntity).FirstOrDefault(a => a.AggregateEntityId == createTestItem.Id);
 
         using (new AssertionScope())
         {
@@ -40,9 +41,9 @@ public class DomainTests
             aggregate!.Type.Should().Be(typeof(TestItem).AssemblyQualifiedName);
             aggregate.Version.Should().Be(1);
         
-            @event.Should().NotBeNull();
-            @event!.Type.Should().Be(typeof(TestItemCreated).AssemblyQualifiedName);
-            @event.Sequence.Should().Be(1);
+            aggregateEvent.Should().NotBeNull();
+            aggregateEvent!.EventEntity.Type.Should().Be(typeof(TestItemCreated).AssemblyQualifiedName);
+            aggregateEvent.Sequence.Should().Be(1);
         }
     }
     
@@ -74,7 +75,7 @@ public class DomainTests
 
         var testItem = dbContext2.Items.FirstOrDefault(i => i.Id == createTestItem.Id);
         var aggregate = dbContext2.Aggregates.FirstOrDefault(a => a.Id == createTestItem.Id);
-        var @event = dbContext2.Events.LastOrDefault(a => a.AggregateEntityId == createTestItem.Id);
+        var aggregateEvent = dbContext2.AggregateEvents.Include(x => x.EventEntity).LastOrDefault(a => a.AggregateEntityId == createTestItem.Id);
 
         using (new AssertionScope())
         {
@@ -86,9 +87,9 @@ public class DomainTests
             aggregate!.Type.Should().Be(typeof(TestItem).AssemblyQualifiedName);
             aggregate.Version.Should().Be(2);
         
-            @event.Should().NotBeNull();
-            @event!.Type.Should().Be(typeof(TestItemNameUpdated).AssemblyQualifiedName);
-            @event.Sequence.Should().Be(2);
+            aggregateEvent.Should().NotBeNull();
+            aggregateEvent!.EventEntity.Type.Should().Be(typeof(TestItemNameUpdated).AssemblyQualifiedName);
+            aggregateEvent.Sequence.Should().Be(2);
         }
     }
     
@@ -120,7 +121,7 @@ public class DomainTests
 
         var testSubItem = dbContext2.SubItems.FirstOrDefault(i => i.TestItemId == createTestItem.Id);
         var aggregate = dbContext2.Aggregates.FirstOrDefault(a => a.Id == createTestItem.Id);
-        var @event = dbContext2.Events.LastOrDefault(a => a.AggregateEntityId == createTestItem.Id);
+        var aggregateEvent = dbContext2.AggregateEvents.Include(x => x.EventEntity).LastOrDefault(a => a.AggregateEntityId == createTestItem.Id);
 
         using (new AssertionScope())
         {
@@ -131,9 +132,9 @@ public class DomainTests
             aggregate!.Type.Should().Be(typeof(TestItem).AssemblyQualifiedName);
             aggregate.Version.Should().Be(2);
         
-            @event.Should().NotBeNull();
-            @event!.Type.Should().Be(typeof(TestSubItemAdded).AssemblyQualifiedName);
-            @event.Sequence.Should().Be(2);
+            aggregateEvent.Should().NotBeNull();
+            aggregateEvent!.EventEntity.Type.Should().Be(typeof(TestSubItemAdded).AssemblyQualifiedName);
+            aggregateEvent.Sequence.Should().Be(2);
         }
     }
 }

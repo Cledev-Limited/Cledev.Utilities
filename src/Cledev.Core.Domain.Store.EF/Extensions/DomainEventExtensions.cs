@@ -5,13 +5,11 @@ namespace Cledev.Core.Domain.Store.EF.Extensions;
 
 public static class DomainEventExtensions
 {
-    public static EventEntity ToEventEntity(this IDomainEvent @event, int version)
+    public static EventEntity ToEventEntity(this IDomainEvent @event)
     {
         return new EventEntity
         {
             Id = @event.Id,
-            AggregateEntityId = @event.AggregateRootId,
-            Sequence = version,
             Type = @event.GetType().AssemblyQualifiedName ?? throw new InvalidOperationException(),
             Data = JsonConvert.SerializeObject(@event),
             TimeStamp = @event.TimeStamp,

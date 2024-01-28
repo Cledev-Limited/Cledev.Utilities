@@ -27,15 +27,17 @@ public abstract class DomainDbContext(
         
         modelBuilder
             .Entity<EventEntity>()
-            .ToTable(name: "Events")
-            .HasOne(x => x.AggregateEntity)
-            .WithMany(x => x.EventEntities)
-            .OnDelete(DeleteBehavior.NoAction)
-            .IsRequired();
+            .ToTable(name: "Events");
+            
+        modelBuilder
+            .Entity<AggregateEventEntity>()
+            .ToTable(name: "AggregateEvents")
+            .HasKey("AggregateEntityId", "EventEntityId");
     }
     
     public DbSet<AggregateEntity> Aggregates { get; set; } = null!;
     public DbSet<EventEntity> Events { get; set; } = null!;
+    public DbSet<AggregateEventEntity> AggregateEvents { get; set; } = null!;
     
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
@@ -78,13 +80,15 @@ public static class DomainDbContextExtensions
     private static async Task<Result<T>> GetAggregateStrongView<T>(this DomainDbContext domainDbContext, string id, int upToVersionNumber = -1) where T : IAggregateRoot
     {
         var eventEntities = upToVersionNumber > 0
-            ? await domainDbContext.Events.AsNoTracking()
-                .Where(eventEntity => eventEntity.AggregateEntityId == id && eventEntity.Sequence <= upToVersionNumber)
-                .OrderBy(eventEntity => eventEntity.Sequence)
+            ? await domainDbContext.AggregateEvents.AsNoTracking()
+                .Where(aggregateEvent => aggregateEvent.AggregateEntityId == id && aggregateEvent.Sequence <= upToVersionNumber)
+                .OrderBy(aggregateEvent => aggregateEvent.Sequence)
+                .Select(aggregateEvent => aggregateEvent.EventEntity)
                 .ToListAsync()
-            : await domainDbContext.Events.AsNoTracking()
-                .Where(eventEntity => eventEntity.AggregateEntityId == id)
-                .OrderBy(eventEntity => eventEntity.Sequence)
+            : await domainDbContext.AggregateEvents.AsNoTracking()
+                .Where(aggregateEvent => aggregateEvent.AggregateEntityId == id)
+                .OrderBy(aggregateEvent => aggregateEvent.Sequence)
+                .Select(aggregateEvent => aggregateEvent.EventEntity)
                 .ToListAsync();
         
         if (eventEntities.Count == 0)
@@ -118,7 +122,7 @@ public static class DomainDbContextExtensions
 
         domainDbContext.TrackAggregate(aggregateRoot, startingVersionNumber);
         domainDbContext.TrackEvents(aggregateRoot, startingVersionNumber);
-        domainDbContext.TrackReadModels(aggregateRoot);
+        domainDbContext.TrackEntities(aggregateRoot);
 
         await domainDbContext.SaveChangesAsync(cancellationToken);
         
@@ -127,7 +131,7 @@ public static class DomainDbContextExtensions
 
     private static async Task<Result<int>> GetStartingVersionNumber(this DomainDbContext domainDbContext, IAggregateRoot aggregateRoot, int expectedVersionNumber, CancellationToken cancellationToken = default)
     {
-        var currentVersionNumber = await domainDbContext.Events.AsNoTracking().CountAsync(eventEntity => eventEntity.AggregateEntityId == aggregateRoot.Id, cancellationToken);
+        var currentVersionNumber = await domainDbContext.AggregateEvents.AsNoTracking().CountAsync(aggregateEventEntity => aggregateEventEntity.AggregateEntityId == aggregateRoot.Id, cancellationToken);
         if (currentVersionNumber != expectedVersionNumber)
         {
             return new Failure(Title: "Concurrency exception");
@@ -154,12 +158,17 @@ public static class DomainDbContextExtensions
         for (var i = 0; i < domainEvents.Length; i++)
         {
             var domainEvent = domainEvents[i];
-            var eventEntity = domainEvent.ToEventEntity(version: startingVersionNumber + i);
-            domainDbContext.Events.Add(eventEntity);
+            domainDbContext.Events.Add(domainEvent.ToEventEntity());
+            domainDbContext.AggregateEvents.Add(new AggregateEventEntity
+            {
+                AggregateEntityId = aggregateRoot.Id,
+                EventEntityId = domainEvent.Id,
+                Sequence = startingVersionNumber + i
+            });
         }
     }
     
-    private static void TrackReadModels(this DbContext domainDbContext, AggregateRoot aggregateRoot)
+    private static void TrackEntities(this DbContext domainDbContext, AggregateRoot aggregateRoot)
     {
         foreach (var entity in aggregateRoot.UncommittedEntities)
         {
