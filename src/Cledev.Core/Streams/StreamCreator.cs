@@ -8,11 +8,8 @@ public class StreamCreator(IServiceProvider serviceProvider) : IStreamCreator
 
     public IAsyncEnumerable<TResponse> Create<TResponse>(IStreamRequest<TResponse> request, CancellationToken cancellationToken = default)
     {
-        if (request is null)
-        {
-            throw new ArgumentNullException(nameof(request));
-        }
-        
+        ArgumentNullException.ThrowIfNull(request);
+
         var streamRequestType = request.GetType();
         var handler = (StreamRequestHandlerWrapperBase<TResponse>)StreamHandlerWrappers.GetOrAdd(streamRequestType, _ => 
             Activator.CreateInstance(typeof(StreamRequestHandlerWrapper<,>).MakeGenericType(streamRequestType, typeof(TResponse))))!;

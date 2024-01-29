@@ -70,22 +70,22 @@ public abstract class DomainDbContext(
 
 public static class DomainDbContextExtensions
 {
-    public static async Task<Result<T>> GetAggregate<T>(this DomainDbContext domainDbContext, string id, ReadMode readMode = ReadMode.Weak, int upToVersionNumber = -1) where T : IAggregateRoot =>
+    public static async Task<Result<T>> GetAggregate<T>(this DomainDbContext domainDbContext, string id, ReadMode readMode = ReadMode.Weak, int upToVersionNumber = -1, CancellationToken cancellationToken = default) where T : IAggregateRoot =>
         readMode is ReadMode.Strong || upToVersionNumber > 0
-            ? await domainDbContext.GetAggregateStrongView<T>(id, upToVersionNumber)
-            : await domainDbContext.GetAggregateWeakView<T>(id);
+            ? await domainDbContext.GetAggregateStrongView<T>(id, upToVersionNumber, cancellationToken: cancellationToken)
+            : await domainDbContext.GetAggregateWeakView<T>(id, cancellationToken: cancellationToken);
 
-    private static async Task<Result<T>> GetAggregateStrongView<T>(this DomainDbContext domainDbContext, string id, int upToVersionNumber = -1) where T : IAggregateRoot
+    private static async Task<Result<T>> GetAggregateStrongView<T>(this DomainDbContext domainDbContext, string id, int upToVersionNumber = -1, CancellationToken cancellationToken = default) where T : IAggregateRoot
     {
         var eventEntities = upToVersionNumber > 0
             ? await domainDbContext.Events.AsNoTracking()
                 .Where(eventEntity => eventEntity.AggregateEntityId == id && eventEntity.Sequence <= upToVersionNumber)
                 .OrderBy(eventEntity => eventEntity.Sequence)
-                .ToListAsync()
+                .ToListAsync(cancellationToken: cancellationToken)
             : await domainDbContext.Events.AsNoTracking()
                 .Where(eventEntity => eventEntity.AggregateEntityId == id)
                 .OrderBy(eventEntity => eventEntity.Sequence)
-                .ToListAsync();
+                .ToListAsync(cancellationToken: cancellationToken);
         
         if (eventEntities.Count == 0)
         {
@@ -97,9 +97,9 @@ public static class DomainDbContextExtensions
         return aggregate;
     }
 
-    private static async Task<Result<T>> GetAggregateWeakView<T>(this DomainDbContext domainDbContext, string id) where T : IAggregateRoot
+    private static async Task<Result<T>> GetAggregateWeakView<T>(this DomainDbContext domainDbContext, string id, CancellationToken cancellationToken = default) where T : IAggregateRoot
     {
-        var aggregateEntity = await domainDbContext.Aggregates.AsNoTracking().FirstOrDefaultAsync(entity => entity.Id == id);
+        var aggregateEntity = await domainDbContext.Aggregates.AsNoTracking().FirstOrDefaultAsync(entity => entity.Id == id, cancellationToken: cancellationToken);
         if (aggregateEntity is null)
         {
             return new Failure(ErrorCodes.NotFound);

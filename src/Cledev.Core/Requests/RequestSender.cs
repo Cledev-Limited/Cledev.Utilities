@@ -10,10 +10,7 @@ public class RequestSender(IServiceProvider serviceProvider) : IRequestSender
 
     public async Task<Result> Send<TRequest>(TRequest request, CancellationToken cancellationToken = default) where TRequest : IRequest
     {
-        if (request is null)
-        {
-            throw new ArgumentNullException(nameof(request));
-        }
+        ArgumentNullException.ThrowIfNull(request);
         
         var handler = serviceProvider.GetService<IRequestHandler<TRequest>>();
 
@@ -27,11 +24,8 @@ public class RequestSender(IServiceProvider serviceProvider) : IRequestSender
 
     public async Task<Result<TResponse>> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
     {
-        if (request is null)
-        {
-            throw new ArgumentNullException(nameof(request));
-        }
-        
+        ArgumentNullException.ThrowIfNull(request);
+
         var requestType = request.GetType();
 
         var handler = (RequestHandlerWrapperBase<TResponse>)RequestHandlerWrappers.GetOrAdd(requestType, _ => 
