@@ -9,7 +9,7 @@ public class UpdateTestItemNameHandler(TestDbContext testDbContext) : IRequestHa
 {
     public async Task<Result> Handle(UpdateTestItemName request, CancellationToken cancellationToken = default)
     {
-        var aggregate = await testDbContext.GetAggregate<TestItem>(request.Id, ReadMode.Strong);
+        var aggregate = await testDbContext.GetAggregate<TestItem>(request.Id, ReadMode.Weak, cancellationToken: cancellationToken);
         if (aggregate.IsNotSuccess)
         {
             return aggregate.Failure!;

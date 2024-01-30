@@ -93,7 +93,7 @@ public static class DomainDbContextExtensions
         }
         
         var aggregate = Activator.CreateInstance<T>();          
-        aggregate.LoadFromHistory(eventEntities.Select(eventEntity => (IDomainEvent)JsonConvert.DeserializeObject(eventEntity.Data, Type.GetType(eventEntity.Type)!)!));
+        aggregate.LoadFromHistory(eventEntities.Select(eventEntity => (DomainEvent)JsonConvert.DeserializeObject(eventEntity.Data, Type.GetType(eventEntity.Type)!)!));
         return aggregate;
     }
 

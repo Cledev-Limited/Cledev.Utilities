@@ -6,16 +6,16 @@ namespace Cledev.Core.Domain;
 
 public interface IAggregateRoot
 {
-    string Id { get; }
-    int Version { get; }
+    string Id { get; set; }
+    int Version { get; set; }
     IEnumerable<IDomainEvent> UncommittedEvents { get; }
     void LoadFromHistory(IEnumerable<IDomainEvent> events);
 }
 
 public abstract class AggregateRoot : IAggregateRoot
 {
-    public string Id { get; protected set; }
-    public int Version { get; private set; }
+    public virtual string Id { get; set; } = null!;
+    public virtual int Version { get; set; }
     
     [JsonIgnore]
     public IEnumerable<IDomainEvent> UncommittedEvents => _uncommittedEvents.AsReadOnly();
@@ -24,27 +24,13 @@ public abstract class AggregateRoot : IAggregateRoot
     [JsonIgnore]
     public IEnumerable<IEntity> UncommittedEntities => _uncommittedEntities.AsReadOnly();
     protected readonly List<IEntity> _uncommittedEntities = [];
-    
-    protected AggregateRoot()
-    {
-        Id = Guid.NewGuid().ToString();
-    }
-
-    protected AggregateRoot(string? id)
-    {
-        if (string.IsNullOrEmpty(id))
-        {
-            id = Guid.NewGuid().ToString();
-        }
-
-        Id = id;
-    }
 
     protected void AddEvent(IDomainEvent @event)
     {
         _uncommittedEvents.Add(@event);
         ApplyEvent(@event);
         AddEntities(@event);
+        Version++;
     }
     
     public void LoadFromHistory(IEnumerable<IDomainEvent> events)

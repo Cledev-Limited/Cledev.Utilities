@@ -9,7 +9,7 @@ public class AddTestSubItemHandler(TestDbContext testDbContext) : IRequestHandle
 {
     public async Task<Result> Handle(AddTestSubItem request, CancellationToken cancellationToken = default)
     {
-        var aggregate = await testDbContext.GetAggregate<TestItem>(request.Id, ReadMode.Strong);
+        var aggregate = await testDbContext.GetAggregate<TestItem>(request.Id, ReadMode.Strong, cancellationToken: cancellationToken);
         if (aggregate.IsNotSuccess)
         {
             return aggregate.Failure!;
