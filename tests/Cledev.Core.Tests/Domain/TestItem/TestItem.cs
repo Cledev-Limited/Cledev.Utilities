@@ -86,40 +86,36 @@ public class TestItem : AggregateRoot
         switch (@event)
         {
             case TestItemCreated itemCreated:
-                _uncommittedEntities.Add(new TestItemEntity
+                _uncommittedEntities.Add(new DbEntity<IEntity>(new TestItemEntity
                 {
                     Id = itemCreated.AggregateRootId,
                     Name = itemCreated.Name,
-                    Description = itemCreated.Description,
-                    State = State.Added
-                });
+                    Description = itemCreated.Description
+                }, State.Added));
                 break;
             case TestItemNameUpdated itemNameUpdated:
-                _uncommittedEntities.Add(new TestItemEntity
+                _uncommittedEntities.Add(new DbEntity<IEntity>(new TestItemEntity
                 {
                     Id = itemNameUpdated.AggregateRootId,
                     Name = itemNameUpdated.Name,
                     Description = Description,
-                    State = State.Modified
-                });
+                }, State.Modified));
                 break;
             case TestItemDescriptionUpdated itemDescriptionUpdated:
-                _uncommittedEntities.Add(new TestItemEntity
+                _uncommittedEntities.Add(new DbEntity<IEntity>(new TestItemEntity
                 {
                     Id = itemDescriptionUpdated.AggregateRootId,
                     Name = Name,
                     Description = itemDescriptionUpdated.Description,
-                    State = State.Modified
-                });                
+                }, State.Modified));
                 break;
             case TestSubItemAdded subItemAdded:
-                _uncommittedEntities.Add(new TestSubItemEntity
+                _uncommittedEntities.Add(new DbEntity<IEntity>(new TestSubItemEntity
                 {
                     Id = subItemAdded.SubItemId,
                     Name = subItemAdded.SubItemName,
-                    TestItemId = subItemAdded.AggregateRootId,
-                    State = State.Added
-                });
+                    TestItemId = subItemAdded.AggregateRootId
+                }, State.Added));
                 break;
         }
     }

@@ -1,16 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿namespace Cledev.Core.Data;
 
-namespace Cledev.Core.Data;
+public interface IEntity;
 
-public interface IEntity
+public class DbEntity<T>(T data, State state) where T : IEntity
 {
-    State State { get; set; }
-}
-
-public abstract class Entity : IEntity
-{
-    [NotMapped]
-    public State State { get; set; }
+    public T Data { get; } = data;
+    public State State { get; } = state;
 }
 
 public enum State

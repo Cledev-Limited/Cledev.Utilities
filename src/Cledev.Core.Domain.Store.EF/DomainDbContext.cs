@@ -161,18 +161,18 @@ public static class DomainDbContextExtensions
     
     private static void TrackEntities(this DbContext domainDbContext, AggregateRoot aggregateRoot)
     {
-        foreach (var entity in aggregateRoot.UncommittedEntities)
+        foreach (var dbEntity in aggregateRoot.UncommittedEntities)
         {
-            switch (entity.State)
+            switch (dbEntity.State)
             {
                 case State.Added:
-                    domainDbContext.Add(entity);
+                    domainDbContext.Add(dbEntity.Data);
                     break;
                 case State.Modified:
-                    domainDbContext.Update(entity);
+                    domainDbContext.Update(dbEntity.Data);
                     break;
                 case State.Deleted:
-                    domainDbContext.Remove(entity);
+                    domainDbContext.Remove(dbEntity.Data);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

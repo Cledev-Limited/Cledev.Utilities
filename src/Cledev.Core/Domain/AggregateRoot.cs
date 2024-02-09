@@ -22,8 +22,8 @@ public abstract class AggregateRoot : IAggregateRoot
     private readonly List<IDomainEvent> _uncommittedEvents = [];
     
     [JsonIgnore]
-    public IEnumerable<IEntity> UncommittedEntities => _uncommittedEntities.AsReadOnly();
-    protected readonly List<IEntity> _uncommittedEntities = [];
+    public IEnumerable<DbEntity<IEntity>> UncommittedEntities => _uncommittedEntities.AsReadOnly();
+    protected readonly List<DbEntity<IEntity>> _uncommittedEntities = [];
 
     protected void AddEvent(IDomainEvent @event)
     {
