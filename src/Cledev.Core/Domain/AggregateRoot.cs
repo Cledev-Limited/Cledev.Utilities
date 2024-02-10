@@ -18,12 +18,14 @@ public abstract class AggregateRoot : IAggregateRoot
     public virtual int Version { get; set; }
     
     [JsonIgnore]
-    public IEnumerable<IDomainEvent> UncommittedEvents => _uncommittedEvents.AsReadOnly();
     private readonly List<IDomainEvent> _uncommittedEvents = [];
+    [JsonIgnore]
+    public IEnumerable<IDomainEvent> UncommittedEvents => _uncommittedEvents.AsReadOnly();
     
     [JsonIgnore]
-    public IEnumerable<DbEntity<IEntity>> UncommittedEntities => _uncommittedEntities.AsReadOnly();
     protected readonly List<DbEntity<IEntity>> _uncommittedEntities = [];
+    [JsonIgnore]
+    public IEnumerable<DbEntity<IEntity>> UncommittedEntities => _uncommittedEntities.AsReadOnly();
 
     protected void AddEvent(IDomainEvent @event)
     {

@@ -5,6 +5,7 @@ using Cledev.Core.Tests.Domain.TestItem.AddTestSubItem;
 using Cledev.Core.Tests.Domain.TestItem.CreateTestItem;
 using Cledev.Core.Tests.Domain.TestItem.UpdateTestItemDescription;
 using Cledev.Core.Tests.Domain.TestItem.UpdateTestItemName;
+using Newtonsoft.Json;
 
 namespace Cledev.Core.Tests.Domain.TestItem;
 
@@ -13,8 +14,10 @@ public class TestItem : AggregateRoot
     public string Name { get; private set; } = null!;
     public string Description { get; private set; } = null!;
 
-    public IEnumerable<TestSubItem> SubItems => _subItems.AsReadOnly();
+    [JsonProperty]
     private readonly List<TestSubItem> _subItems = [];
+    [JsonIgnore]
+    public IEnumerable<TestSubItem> SubItems => _subItems.AsReadOnly();
     
     public TestItem() { }
 

@@ -120,7 +120,7 @@ public class DomainTests
         await addTestSubItemHandler.Handle(addTestSubItem);
 
         var testSubItem = dbContext2.SubItems.FirstOrDefault(i => i.TestItemId == createTestItem.Id);
-        var aggregate = dbContext2.Aggregates.FirstOrDefault(a => a.Id == createTestItem.Id);
+        var aggregate = await dbContext2.GetAggregate<TestItem>(createTestItem.Id);
         var @event = dbContext2.Events.LastOrDefault(a => a.AggregateEntityId == createTestItem.Id);
 
         using (new AssertionScope())
@@ -128,9 +128,8 @@ public class DomainTests
             testSubItem.Should().NotBeNull();
             testSubItem!.Name.Should().Be(addTestSubItem.SubItemName);
             
-            aggregate.Should().NotBeNull();
-            aggregate!.Type.Should().Be(typeof(TestItem).AssemblyQualifiedName);
-            aggregate.Version.Should().Be(2);
+            aggregate.Value.Should().NotBeNull();
+            aggregate.Value!.SubItems.Should().HaveCount(1);
         
             @event.Should().NotBeNull();
             @event!.Type.Should().Be(typeof(TestSubItemAdded).AssemblyQualifiedName);
@@ -197,7 +196,8 @@ public class DomainTests
         await using (var dbContext = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor()))
         {
             var aggregate = await dbContext.GetAggregate<TestItem>(testItemId, upToVersionNumber: 3);
-            aggregate.Value!.Name.Should().Be("Updated Test Item 2");         
+            aggregate.Value!.Name.Should().Be("Updated Test Item 2");      
+            aggregate.Value!.Description.Should().Be("Test Description");      
         }
     }
 }
