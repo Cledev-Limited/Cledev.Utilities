@@ -10,7 +10,7 @@ public class Publisher(IServiceProvider serviceProvider) : IPublisher
         var handlers = serviceProvider.GetServices<INotificationHandler<TNotification>>();
         
         var notificationHandlers = handlers as INotificationHandler<TNotification>[] ?? handlers.ToArray();
-        if (notificationHandlers.Any() is false)
+        if (notificationHandlers.Length == 0)
         {
             return Enumerable.Empty<Result>();
         }

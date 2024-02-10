@@ -2,7 +2,7 @@
 
 namespace Cledev.Core.Mapping;
 
-public class ObjectFactory(IMapper mapper) : IObjectFactory
+public class ObjectFactory(IMapperBase mapper) : IObjectFactory
 {
     /// <inheritdoc />
     public dynamic CreateConcreteObject(object obj)

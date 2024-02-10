@@ -5,8 +5,7 @@ using Cledev.Core.Streams;
 
 namespace Cledev.Core;
 
-public class Dispatcher(IRequestSender requestSender, IPublisher publisher, IStreamCreator streamCreator)
-    : IDispatcher
+public class Dispatcher(IRequestSender requestSender, IPublisher publisher, IStreamCreator streamCreator) : IDispatcher
 {
     public async Task<Result> Send<TRequest>(TRequest request, CancellationToken cancellationToken = default) where TRequest : IRequest
     {

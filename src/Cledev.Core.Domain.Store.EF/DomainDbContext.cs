@@ -27,7 +27,11 @@ public abstract class DomainDbContext(
         
         modelBuilder
             .Entity<EventEntity>()
-            .ToTable(name: "Events");
+            .ToTable(name: "Events")
+            .HasOne(x => x.AggregateEntity)
+            .WithMany(x => x.EventEntities)
+            .OnDelete(DeleteBehavior.NoAction)
+            .IsRequired();
     }
     
     public DbSet<AggregateEntity> Aggregates { get; set; } = null!;
@@ -66,22 +70,27 @@ public abstract class DomainDbContext(
 
 public static class DomainDbContextExtensions
 {
-    public static async Task<Result<T>> GetAggregate<T>(this DomainDbContext domainDbContext, string id, ReadMode readMode = ReadMode.Weak, int upToVersionNumber = -1) where T : IAggregateRoot =>
+    private static readonly JsonSerializerSettings JsonSerializerSettings = new()
+    {
+        ContractResolver = new PrivateSetterContractResolver()
+    };
+    
+    public static async Task<Result<T>> GetAggregate<T>(this DomainDbContext domainDbContext, string id, ReadMode readMode = ReadMode.Weak, int upToVersionNumber = -1, CancellationToken cancellationToken = default) where T : IAggregateRoot =>
         readMode is ReadMode.Strong || upToVersionNumber > 0
-            ? await domainDbContext.GetAggregateStrongView<T>(id)
-            : await domainDbContext.GetAggregateWeakView<T>(id);
+            ? await domainDbContext.GetAggregateStrongView<T>(id, upToVersionNumber, cancellationToken: cancellationToken)
+            : await domainDbContext.GetAggregateWeakView<T>(id, cancellationToken: cancellationToken);
 
-    private static async Task<Result<T>> GetAggregateStrongView<T>(this DomainDbContext domainDbContext, string id, int upToVersionNumber = -1) where T : IAggregateRoot
+    private static async Task<Result<T>> GetAggregateStrongView<T>(this DomainDbContext domainDbContext, string id, int upToVersionNumber = -1, CancellationToken cancellationToken = default) where T : IAggregateRoot
     {
         var eventEntities = upToVersionNumber > 0
             ? await domainDbContext.Events.AsNoTracking()
-                .Where(eventEntity => eventEntity.AggregateRootId == id && eventEntity.Sequence <= upToVersionNumber)
+                .Where(eventEntity => eventEntity.AggregateEntityId == id && eventEntity.Sequence <= upToVersionNumber)
                 .OrderBy(eventEntity => eventEntity.Sequence)
-                .ToListAsync()
+                .ToListAsync(cancellationToken: cancellationToken)
             : await domainDbContext.Events.AsNoTracking()
-                .Where(eventEntity => eventEntity.AggregateRootId == id)
+                .Where(eventEntity => eventEntity.AggregateEntityId == id)
                 .OrderBy(eventEntity => eventEntity.Sequence)
-                .ToListAsync();
+                .ToListAsync(cancellationToken: cancellationToken);
         
         if (eventEntities.Count == 0)
         {
@@ -89,18 +98,18 @@ public static class DomainDbContextExtensions
         }
         
         var aggregate = Activator.CreateInstance<T>();          
-        aggregate.LoadFromHistory(eventEntities.Select(eventEntity => (IDomainEvent)JsonConvert.DeserializeObject(eventEntity.Data, Type.GetType(eventEntity.Type)!)!));
+        aggregate.LoadFromHistory(eventEntities.Select(eventEntity => (DomainEvent)JsonConvert.DeserializeObject(eventEntity.Data, Type.GetType(eventEntity.Type)!, JsonSerializerSettings)!));
         return aggregate;
     }
 
-    private static async Task<Result<T>> GetAggregateWeakView<T>(this DomainDbContext domainDbContext, string id) where T : IAggregateRoot
+    private static async Task<Result<T>> GetAggregateWeakView<T>(this DomainDbContext domainDbContext, string id, CancellationToken cancellationToken = default) where T : IAggregateRoot
     {
-        var aggregateEntity = await domainDbContext.Aggregates.AsNoTracking().FirstOrDefaultAsync(entity => entity.Id == id);
+        var aggregateEntity = await domainDbContext.Aggregates.AsNoTracking().FirstOrDefaultAsync(entity => entity.Id == id, cancellationToken: cancellationToken);
         if (aggregateEntity is null)
         {
             return new Failure(ErrorCodes.NotFound);
         }
-        return (T)JsonConvert.DeserializeObject(aggregateEntity.Data, Type.GetType(aggregateEntity.Type)!)!;
+        return (T)JsonConvert.DeserializeObject(aggregateEntity.Data, Type.GetType(aggregateEntity.Type)!, JsonSerializerSettings)!;
     }
     
     public static async Task<Result> SaveAggregate(this DomainDbContext domainDbContext, AggregateRoot aggregateRoot, int expectedVersionNumber, CancellationToken cancellationToken = default)
@@ -114,7 +123,7 @@ public static class DomainDbContextExtensions
 
         domainDbContext.TrackAggregate(aggregateRoot, startingVersionNumber);
         domainDbContext.TrackEvents(aggregateRoot, startingVersionNumber);
-        domainDbContext.TrackReadModels(aggregateRoot);
+        domainDbContext.TrackEntities(aggregateRoot);
 
         await domainDbContext.SaveChangesAsync(cancellationToken);
         
@@ -123,7 +132,7 @@ public static class DomainDbContextExtensions
 
     private static async Task<Result<int>> GetStartingVersionNumber(this DomainDbContext domainDbContext, IAggregateRoot aggregateRoot, int expectedVersionNumber, CancellationToken cancellationToken = default)
     {
-        var currentVersionNumber = await domainDbContext.Events.CountAsync(eventEntity => eventEntity.AggregateRootId == aggregateRoot.Id, cancellationToken);
+        var currentVersionNumber = await domainDbContext.Events.AsNoTracking().CountAsync(eventEntity => eventEntity.AggregateEntityId == aggregateRoot.Id, cancellationToken);
         if (currentVersionNumber != expectedVersionNumber)
         {
             return new Failure(Title: "Concurrency exception");
@@ -155,20 +164,20 @@ public static class DomainDbContextExtensions
         }
     }
     
-    private static void TrackReadModels(this DbContext domainDbContext, AggregateRoot aggregateRoot)
+    private static void TrackEntities(this DbContext domainDbContext, AggregateRoot aggregateRoot)
     {
-        foreach (var entity in aggregateRoot.ReadModels)
+        foreach (var dbEntity in aggregateRoot.UncommittedEntities)
         {
-            switch (entity.State)
+            switch (dbEntity.State)
             {
                 case State.Added:
-                    domainDbContext.Add(entity);
+                    domainDbContext.Add(dbEntity.Data);
                     break;
                 case State.Modified:
-                    domainDbContext.Update(entity);
+                    domainDbContext.Update(dbEntity.Data);
                     break;
                 case State.Deleted:
-                    domainDbContext.Remove(entity);
+                    domainDbContext.Remove(dbEntity.Data);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

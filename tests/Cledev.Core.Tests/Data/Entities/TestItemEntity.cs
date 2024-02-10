@@ -2,11 +2,11 @@
 
 namespace Cledev.Core.Tests.Data.Entities;
 
-public sealed class TestItemEntity : Entity
+public class TestItemEntity : IEntity
 {
     public string Id { get; set; } = null!;
     public string Name { get; set; } = null!;
     public string Description { get; set; } = null!;
     
-    public List<TestSubItemEntity> TestSubItems { get; set; } = new();
+    public virtual List<TestSubItemEntity> TestSubItems { get; set; } = new();
 }

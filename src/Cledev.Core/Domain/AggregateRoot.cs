@@ -6,58 +6,44 @@ namespace Cledev.Core.Domain;
 
 public interface IAggregateRoot
 {
-    string Id { get; }
-    int Version { get; }
+    string Id { get; set; }
+    int Version { get; set; }
     IEnumerable<IDomainEvent> UncommittedEvents { get; }
     void LoadFromHistory(IEnumerable<IDomainEvent> events);
 }
 
 public abstract class AggregateRoot : IAggregateRoot
 {
-    public string Id { get; protected set; }
-    public int Version { get; private set; }
+    public virtual string Id { get; set; } = null!;
+    public virtual int Version { get; set; }
     
+    [JsonIgnore]
+    private readonly List<IDomainEvent> _uncommittedEvents = [];
     [JsonIgnore]
     public IEnumerable<IDomainEvent> UncommittedEvents => _uncommittedEvents.AsReadOnly();
-    private readonly List<IDomainEvent> _uncommittedEvents = new();
     
     [JsonIgnore]
-    public IEnumerable<IEntity> ReadModels => _readModels.AsReadOnly();
-    protected readonly List<IEntity> _readModels = new();
-    
-    protected AggregateRoot()
-    {
-        Id = Guid.NewGuid().ToString();
-    }
-
-    protected AggregateRoot(string? id)
-    {
-        if (string.IsNullOrEmpty(id))
-        {
-            id = Guid.NewGuid().ToString();
-        }
-
-        Id = id;
-    }
+    protected readonly List<DbEntity<IEntity>> _uncommittedEntities = [];
+    [JsonIgnore]
+    public IEnumerable<DbEntity<IEntity>> UncommittedEntities => _uncommittedEntities.AsReadOnly();
 
     protected void AddEvent(IDomainEvent @event)
     {
         _uncommittedEvents.Add(@event);
-        Apply(@event);
-        AddReadModels(@event);
+        ApplyEvent(@event);
+        AddEntities(@event);
+        Version++;
     }
     
-    public void LoadFromHistory(IEnumerable<IDomainEvent> domainEvents)
+    public void LoadFromHistory(IEnumerable<IDomainEvent> events)
     {
-        var events = domainEvents as IDomainEvent[] ?? domainEvents.ToArray();
-
         foreach (var @event in events)
         {
-            Apply(@event);
+            ApplyEvent(@event);
             Version++;
         }
     }
     
-    protected abstract void Apply<T>(T @event) where T : IDomainEvent;
-    protected abstract void AddReadModels<T>(T @event) where T : IDomainEvent;
+    protected abstract void ApplyEvent<T>(T @event) where T : IDomainEvent;
+    protected abstract void AddEntities<T>(T @event) where T : IDomainEvent;
 }

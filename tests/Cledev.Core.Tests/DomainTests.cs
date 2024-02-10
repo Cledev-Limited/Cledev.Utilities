@@ -1,4 +1,5 @@
-﻿using Cledev.Core.Tests.Data;
+﻿using Cledev.Core.Domain.Store.EF;
+using Cledev.Core.Tests.Data;
 using Cledev.Core.Tests.Domain.TestItem;
 using Cledev.Core.Tests.Domain.TestItem.AddTestSubItem;
 using Cledev.Core.Tests.Domain.TestItem.CreateTestItem;
@@ -28,7 +29,7 @@ public class DomainTests
 
         var testItem = dbContext.Items.FirstOrDefault(i => i.Id == createTestItem.Id);
         var aggregate = dbContext.Aggregates.FirstOrDefault(a => a.Id == createTestItem.Id);
-        var @event = dbContext.Events.FirstOrDefault(a => a.AggregateRootId == createTestItem.Id);
+        var @event = dbContext.Events.FirstOrDefault(a => a.AggregateEntityId == createTestItem.Id);
 
         using (new AssertionScope())
         {
@@ -74,7 +75,7 @@ public class DomainTests
 
         var testItem = dbContext2.Items.FirstOrDefault(i => i.Id == createTestItem.Id);
         var aggregate = dbContext2.Aggregates.FirstOrDefault(a => a.Id == createTestItem.Id);
-        var @event = dbContext2.Events.LastOrDefault(a => a.AggregateRootId == createTestItem.Id);
+        var @event = dbContext2.Events.LastOrDefault(a => a.AggregateEntityId == createTestItem.Id);
 
         using (new AssertionScope())
         {
@@ -119,21 +120,84 @@ public class DomainTests
         await addTestSubItemHandler.Handle(addTestSubItem);
 
         var testSubItem = dbContext2.SubItems.FirstOrDefault(i => i.TestItemId == createTestItem.Id);
-        var aggregate = dbContext2.Aggregates.FirstOrDefault(a => a.Id == createTestItem.Id);
-        var @event = dbContext2.Events.LastOrDefault(a => a.AggregateRootId == createTestItem.Id);
+        var aggregate = await dbContext2.GetAggregate<TestItem>(createTestItem.Id);
+        var @event = dbContext2.Events.LastOrDefault(a => a.AggregateEntityId == createTestItem.Id);
 
         using (new AssertionScope())
         {
             testSubItem.Should().NotBeNull();
             testSubItem!.Name.Should().Be(addTestSubItem.SubItemName);
             
-            aggregate.Should().NotBeNull();
-            aggregate!.Type.Should().Be(typeof(TestItem).AssemblyQualifiedName);
-            aggregate.Version.Should().Be(2);
+            aggregate.Value.Should().NotBeNull();
+            aggregate.Value!.SubItems.Should().HaveCount(1);
         
             @event.Should().NotBeNull();
             @event!.Type.Should().Be(typeof(TestSubItemAdded).AssemblyQualifiedName);
             @event.Sequence.Should().Be(2);
+        }
+    }
+    
+    [Fact]
+    public async Task ShouldReturnAnAggregateUpToASpecificVersionNumber()
+    {
+        var testItemId = Guid.NewGuid().ToString();
+
+        await using (var dbContext = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor()))
+        {
+            var createTestItemHandler = new CreateTestItemHandler(dbContext);
+            await createTestItemHandler.Handle(new CreateTestItem
+            {
+                Id = testItemId,
+                Name = "Test Item",
+                Description = "Test Description"
+            });
+        }
+
+        await using (var dbContext = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor()))
+        {
+            var updateTestItemHandler = new UpdateTestItemNameHandler(dbContext);
+            await updateTestItemHandler.Handle(new UpdateTestItemName
+            {
+                Id = testItemId,
+                Name = "Updated Test Item 1"
+            });
+        }
+        
+        await using (var dbContext = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor()))
+        {
+            var updateTestItemHandler = new UpdateTestItemNameHandler(dbContext);
+            await updateTestItemHandler.Handle(new UpdateTestItemName
+            {
+                Id = testItemId,
+                Name = "Updated Test Item 2"
+            });            
+        }
+        
+        await using (var dbContext = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor()))
+        {
+            var updateTestItemHandler = new UpdateTestItemNameHandler(dbContext);
+            await updateTestItemHandler.Handle(new UpdateTestItemName
+            {
+                Id = testItemId,
+                Name = "Updated Test Item 3"
+            });            
+        }
+        
+        await using (var dbContext = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor()))
+        {
+            var updateTestItemHandler = new UpdateTestItemNameHandler(dbContext);
+            await updateTestItemHandler.Handle(new UpdateTestItemName
+            {
+                Id = testItemId,
+                Name = "Updated Test Item 4"
+            });            
+        }
+
+        await using (var dbContext = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor()))
+        {
+            var aggregate = await dbContext.GetAggregate<TestItem>(testItemId, upToVersionNumber: 3);
+            aggregate.Value!.Name.Should().Be("Updated Test Item 2");      
+            aggregate.Value!.Description.Should().Be("Test Description");      
         }
     }
 }
