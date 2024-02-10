@@ -1,7 +1,7 @@
 ﻿namespace Cledev.Core.Tests.Domain.TestItem;
 
-public class TestSubItem
+public class TestSubItem(Guid id, string name)
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; } = null!;
+    public Guid Id { get; private set; } = id;
+    public string Name { get; private set; } = name;
 }

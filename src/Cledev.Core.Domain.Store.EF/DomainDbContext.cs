@@ -70,6 +70,11 @@ public abstract class DomainDbContext(
 
 public static class DomainDbContextExtensions
 {
+    private static readonly JsonSerializerSettings JsonSerializerSettings = new()
+    {
+        ContractResolver = new PrivateSetterContractResolver()
+    };
+    
     public static async Task<Result<T>> GetAggregate<T>(this DomainDbContext domainDbContext, string id, ReadMode readMode = ReadMode.Weak, int upToVersionNumber = -1, CancellationToken cancellationToken = default) where T : IAggregateRoot =>
         readMode is ReadMode.Strong || upToVersionNumber > 0
             ? await domainDbContext.GetAggregateStrongView<T>(id, upToVersionNumber, cancellationToken: cancellationToken)
@@ -93,7 +98,7 @@ public static class DomainDbContextExtensions
         }
         
         var aggregate = Activator.CreateInstance<T>();          
-        aggregate.LoadFromHistory(eventEntities.Select(eventEntity => (DomainEvent)JsonConvert.DeserializeObject(eventEntity.Data, Type.GetType(eventEntity.Type)!)!));
+        aggregate.LoadFromHistory(eventEntities.Select(eventEntity => (DomainEvent)JsonConvert.DeserializeObject(eventEntity.Data, Type.GetType(eventEntity.Type)!, JsonSerializerSettings)!));
         return aggregate;
     }
 
@@ -104,7 +109,7 @@ public static class DomainDbContextExtensions
         {
             return new Failure(ErrorCodes.NotFound);
         }
-        return (T)JsonConvert.DeserializeObject(aggregateEntity.Data, Type.GetType(aggregateEntity.Type)!)!;
+        return (T)JsonConvert.DeserializeObject(aggregateEntity.Data, Type.GetType(aggregateEntity.Type)!, JsonSerializerSettings)!;
     }
     
     public static async Task<Result> SaveAggregate(this DomainDbContext domainDbContext, AggregateRoot aggregateRoot, int expectedVersionNumber, CancellationToken cancellationToken = default)
