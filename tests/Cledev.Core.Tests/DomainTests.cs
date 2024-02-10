@@ -1,4 +1,5 @@
-﻿using Cledev.Core.Tests.Data;
+﻿using Cledev.Core.Domain.Store.EF;
+using Cledev.Core.Tests.Data;
 using Cledev.Core.Tests.Domain.TestItem;
 using Cledev.Core.Tests.Domain.TestItem.AddTestSubItem;
 using Cledev.Core.Tests.Domain.TestItem.CreateTestItem;
@@ -134,6 +135,69 @@ public class DomainTests
             @event.Should().NotBeNull();
             @event!.Type.Should().Be(typeof(TestSubItemAdded).AssemblyQualifiedName);
             @event.Sequence.Should().Be(2);
+        }
+    }
+    
+    [Fact]
+    public async Task ShouldReturnAnAggregateUpToASpecificVersionNumber()
+    {
+        var testItemId = Guid.NewGuid().ToString();
+
+        await using (var dbContext = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor()))
+        {
+            var createTestItemHandler = new CreateTestItemHandler(dbContext);
+            await createTestItemHandler.Handle(new CreateTestItem
+            {
+                Id = testItemId,
+                Name = "Test Item",
+                Description = "Test Description"
+            });
+        }
+
+        await using (var dbContext = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor()))
+        {
+            var updateTestItemHandler = new UpdateTestItemNameHandler(dbContext);
+            await updateTestItemHandler.Handle(new UpdateTestItemName
+            {
+                Id = testItemId,
+                Name = "Updated Test Item 1"
+            });
+        }
+        
+        await using (var dbContext = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor()))
+        {
+            var updateTestItemHandler = new UpdateTestItemNameHandler(dbContext);
+            await updateTestItemHandler.Handle(new UpdateTestItemName
+            {
+                Id = testItemId,
+                Name = "Updated Test Item 2"
+            });            
+        }
+        
+        await using (var dbContext = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor()))
+        {
+            var updateTestItemHandler = new UpdateTestItemNameHandler(dbContext);
+            await updateTestItemHandler.Handle(new UpdateTestItemName
+            {
+                Id = testItemId,
+                Name = "Updated Test Item 3"
+            });            
+        }
+        
+        await using (var dbContext = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor()))
+        {
+            var updateTestItemHandler = new UpdateTestItemNameHandler(dbContext);
+            await updateTestItemHandler.Handle(new UpdateTestItemName
+            {
+                Id = testItemId,
+                Name = "Updated Test Item 4"
+            });            
+        }
+
+        await using (var dbContext = new TestDbContext(Shared.CreateContextOptions(), new FakeTimeProvider(), Shared.CreateHttpContextAccessor()))
+        {
+            var aggregate = await dbContext.GetAggregate<TestItem>(testItemId, upToVersionNumber: 3);
+            aggregate.Value!.Name.Should().Be("Updated Test Item 2");         
         }
     }
 }
